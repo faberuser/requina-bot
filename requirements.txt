@@ -1,0 +1,6 @@
+discord.py
+requests
+cfscrape
+bs4
+fuzzywuzzy
+youtube-dl
