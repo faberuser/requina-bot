@@ -71,6 +71,7 @@ class Hololive(commands.Cog):
         await self.player.disconnect(force=True)
         self.queue = []
         self.player = None
+        self.channel = None
 
 def setup(client):
     client.add_cog(Hololive(client))
