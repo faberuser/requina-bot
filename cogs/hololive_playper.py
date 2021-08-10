@@ -49,6 +49,8 @@ class Hololive(commands.Cog):
     async def hololive_end(self, ctx):
         if ctx.author.id != 417983447488004097:
             return
+        if self.player == None:
+            return
         await self.player.disconnect(force=True)
         self.queue = []
         self.player = None
