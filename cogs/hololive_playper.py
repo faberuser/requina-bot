@@ -25,8 +25,10 @@ class Hololive(commands.Cog):
         for file in os.listdir('./hololive chill/Sunshine'):
             if file.endswith('.mp3'):
                 sunshine.append((f'./hololive chill/Sunshine/{file}', file[:-4]))
-        sunshin.sort()
+        sunshine.sort()
         for music in midnight:
+            self.queue.append((discord.FFmpegPCMAudio(music[0]), music[1]))
+        for music in sunshine:
             self.queue.append((discord.FFmpegPCMAudio(music[0]), music[1]))
         if self.channel == None:
             try:
