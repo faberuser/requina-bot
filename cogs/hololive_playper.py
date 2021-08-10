@@ -27,26 +27,26 @@ class Hololive(commands.Cog):
                 sunshine.append((f'./hololive chill/Sunshine/{file}', file[:-4]))
         sunshine.sort()
         for music in midnight:
-            self.queue.append((discord.FFmpegPCMAudio(music[0]), music[1]))
+            self.queue.append(music)
         for music in sunshine:
-            self.queue.append((discord.FFmpegPCMAudio(music[0]), music[1]))
+            self.queue.append(music)
         if self.channel == None:
+            self.channel = channel
             try:
-                self.channel = channel
                 voice_channel = self.client.get_channel(channel)
                 self.player = await voice_channel.connect(reconnect=True)
             except:
                 pass
         else:
+            self.channel = channel
             try:
-                self.channel = channel
                 voice_channel = self.client.get_channel(channel)
                 self.player = await self.client.move_to(voice_channel)
             except:
                 pass
         queue = cycle(self.queue)
         while True:
-            if self.player == None:
+            if self.player == None or self.channel == None or self.queue == []:
                 try:
                     await self.player.disconnect(force=True)
                 except:
@@ -56,11 +56,12 @@ class Hololive(commands.Cog):
                 await sleep(3)
                 continue
             playing = next(queue)
-            self.player.play(playing[0])
+            audio = discord.FFmpegPCMAudio(playing[0])
             try:
                 await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
             except:
                 pass
+            self.player.play(audio)
 
     @commands.command()
     async def hololive_end(self, ctx):
