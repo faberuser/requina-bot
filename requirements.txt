@@ -4,3 +4,4 @@ cfscrape
 bs4
 fuzzywuzzy
 youtube-dl
+PyNaCl

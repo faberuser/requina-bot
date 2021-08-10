@@ -25,21 +25,18 @@ class Hololive(commands.Cog):
         if self.channel == None:
             try:
                 self.channel = channel
-                voice_channel = self.client.get_channel(self.channel)
+                voice_channel = self.client.get_channel(channel)
                 self.player = await voice_channel.connect(reconnect=True)
             except:
                 pass
         else:
             try:
                 self.channel = channel
-                voice_channel = self.client.get_channel(self.channel)
-                self.player = self.client.move_to(voice_channel)
+                voice_channel = self.client.get_channel(channel)
+                self.player = await self.client.move_to(voice_channel)
             except:
                 pass
         queue = cycle(self.queue)
-        playing = next(queue)
-        self.player.play(playing[0])
-        await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
         while True:
             if self.player.is_playing():
                 await sleep(3)
