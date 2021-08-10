@@ -1,4 +1,4 @@
-import discord, os
+import discord, os, config
 from itertools import cycle
 from asyncio import sleep
 from discord.ext import commands
@@ -14,14 +14,20 @@ class Hololive(commands.Cog):
 
     @commands.command()
     async def hololive(self, ctx, channel:int):
-        if ctx.author.id != 417983447488004097:
+        if ctx.author.id not in config.owners:
             return
+        midnight = []
         for file in os.listdir('./hololive chill/Midnight'):
             if file.endswith('.mp3'):
-                self.queue.append((discord.FFmpegPCMAudio(f'./hololive chill/Midnight/{file}'), file[:-4]))
+                midnight.append((f'./hololive chill/Midnight/{file}', file[:-4]))
+        midnight.sort()
+        sunshine = []
         for file in os.listdir('./hololive chill/Sunshine'):
             if file.endswith('.mp3'):
-                self.queue.append((discord.FFmpegPCMAudio(f'./hololive chill/Sunshine/{file}'), file[:-4]))
+                sunshine.append((f'./hololive chill/Sunshine/{file}', file[:-4]))
+        sunshin.sort()
+        for music in midnight:
+            self.queue.append((discord.FFmpegPCMAudio(music[0]), music[1]))
         if self.channel == None:
             try:
                 self.channel = channel
@@ -38,16 +44,25 @@ class Hololive(commands.Cog):
                 pass
         queue = cycle(self.queue)
         while True:
+            if self.player == None:
+                try:
+                    await self.player.disconnect(force=True)
+                except:
+                    pass
+                break
             if self.player.is_playing():
                 await sleep(3)
                 continue
             playing = next(queue)
             self.player.play(playing[0])
-            await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
+            try:
+                await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
+            except:
+                pass
 
     @commands.command()
     async def hololive_end(self, ctx):
-        if ctx.author.id != 417983447488004097:
+        if ctx.author.id not in config.owners:
             return
         if self.player == None:
             return

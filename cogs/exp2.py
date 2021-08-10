@@ -1,4 +1,4 @@
-import discord
+import discord, config
 from discord.ext import commands
 
 class Hello(commands.Cog):
@@ -16,7 +16,7 @@ class Hello(commands.Cog):
                 return m.content == str('um') and m.channel == channel or m.content == str('Um') and m.channel == channel or m.content == str('Umm') and m.channel == channel or m.content == str('umm') and m.channel == channel or m.content == str('Uhm') and m.channel == channel or m.content == str('uhm') and m.channel == channel or m.content == str('yes') and m.channel == channel or m.content == str('Yes') and m.channel == channel
 
             msg = await self.client.wait_for('message', check=check)
-            if message.author.id == 470081764271063060 or message.author.id == 315724989057990663 or message.author.id == 213186434193031168:
+            if message.author.id in config.owners:
 
                 await channel.send('Master, I love you! Huh'.format(msg))
                 #print('{.author.name},{.author.id}'.format(msg,msg))
