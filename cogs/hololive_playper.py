@@ -1,4 +1,4 @@
-import discord, os, config
+import discord, os, config, traceback
 from itertools import cycle
 from asyncio import sleep
 from discord.ext import commands
@@ -12,10 +12,11 @@ class Hololive(commands.Cog):
         self.player = None
         self.channel = None
 
-    @commands.command()
-    async def hololive(self, ctx, channel:int):
+    @commands.command() # 24/7 hololive chill music player
+    async def hololive(self, ctx, channel:int=None):
         if ctx.author.id not in config.owners:
             return
+        # get music songs path
         midnight = []
         for file in os.listdir('./hololive chill/Midnight'):
             if file.endswith('.mp3'):
@@ -26,17 +27,33 @@ class Hololive(commands.Cog):
             if file.endswith('.mp3'):
                 sunshine.append((f'./hololive chill/Sunshine/{file}', file[:-4]))
         sunshine.sort()
+
+        # append to a public list
         for music in midnight:
             self.queue.append(music)
         for music in sunshine:
             self.queue.append(music)
-        if self.channel == None:
-            self.channel = channel
-            try:
-                voice_channel = self.client.get_channel(channel)
-                self.player = await voice_channel.connect(reconnect=True)
-            except:
-                pass
+
+        # join voice channel
+        if self.channel is None:
+            if channel is None:
+                self.channel = ctx.author.voice.channel
+                voice_channel = ctx.author.voice.channel
+                self.player = await self.channel.connect(reconnect=True, timeout=30)
+            else:
+                try:
+                    voice_channel = self.client.get_channel(channel)
+                    self.player = await voice_channel.connect(reconnect=True, timeout=30)
+                    self.channel = channel
+                except:
+                    voice_channel = await self.client.fetch_channel(channel)
+                    self.player = await voice_channel.connect(reconnect=True, timeout=30)
+                    self.channel = channel
+                finally:
+                    guild = self.client.get_guild(ctx.author.guild.id)
+                    voice_channel = guild.get_channel(channel)
+                    self.player = await voice_channel.connect(reconnect=True, timeout=30)
+                    self.channel = channel
         else:
             self.channel = channel
             try:
@@ -44,6 +61,8 @@ class Hololive(commands.Cog):
                 self.player = await self.client.move_to(voice_channel)
             except:
                 pass
+
+        # loop music player
         queue = cycle(self.queue)
         while True:
             if self.player == None or self.channel == None or self.queue == []:
@@ -63,7 +82,7 @@ class Hololive(commands.Cog):
                 pass
             self.player.play(audio)
 
-    @commands.command()
+    @commands.command() # end the player
     async def hololive_end(self, ctx):
         if ctx.author.id not in config.owners:
             return
