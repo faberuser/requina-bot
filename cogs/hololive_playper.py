@@ -46,14 +46,15 @@ class Hololive(commands.Cog):
                     self.player = await voice_channel.connect(reconnect=True, timeout=30)
                     self.channel = channel
                 except:
-                    voice_channel = await self.client.fetch_channel(channel)
-                    self.player = await voice_channel.connect(reconnect=True, timeout=30)
-                    self.channel = channel
-                finally:
-                    guild = self.client.get_guild(ctx.author.guild.id)
-                    voice_channel = guild.get_channel(channel)
-                    self.player = await voice_channel.connect(reconnect=True, timeout=30)
-                    self.channel = channel
+                    try:
+                        voice_channel = await self.client.fetch_channel(channel)
+                        self.player = await voice_channel.connect(reconnect=True, timeout=30)
+                        self.channel = channel
+                    except:
+                        guild = self.client.get_guild(ctx.author.guild.id)
+                        voice_channel = guild.get_channel(channel)
+                        self.player = await voice_channel.connect(reconnect=True, timeout=30)
+                        self.channel = channel
         else:
             self.channel = channel
             try:
@@ -81,6 +82,41 @@ class Hololive(commands.Cog):
             except:
                 pass
             self.player.play(audio)
+
+    @commands.command()
+    async def hololive_list(self, ctx):
+        midnight = []
+        for file in os.listdir('./hololive chill/Midnight'):
+            if file.endswith('.mp3'):
+                midnight.append(file[:-4])
+        midnight.sort()
+        sunshine = []
+        for file in os.listdir('./hololive chill/Sunshine'):
+            if file.endswith('.mp3'):
+                sunshine.append(file[:-4])
+        sunshine.sort()
+
+        des = ''
+        try:
+            current = (ctx.author.voice.channel.name)[:-24]
+            for music in midnight:
+                if current == music:
+                    des+=music+' **(Now playing)**'+'\n'
+                else:
+                    des+=music+'\n'
+            for music in sunshine:
+                if current == music:
+                    des+=music+' **(Now playing)**'+'\n'
+                else:
+                    des+=music+'\n'
+        except:
+            for music in midnight:
+                des+=music+'\n'
+            for music in sunshine:
+                des+=music+'\n'
+
+        embed = discord.Embed(title='Hololive Chill Songs', description=des)
+        await ctx.send(embed=embed)
 
     @commands.command() # end the player
     async def hololive_end(self, ctx):
