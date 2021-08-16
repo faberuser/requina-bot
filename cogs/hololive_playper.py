@@ -22,6 +22,7 @@ class Hololive(commands.Cog):
             return
         try:
             self.get_songs()
+
             # join voice channel
             if self.channel is None:
                 if channel is None:
@@ -51,46 +52,64 @@ class Hololive(commands.Cog):
                 except:
                     voice_channel = await self.client.fetch_channel(channel)
                     self.player = await self.client.move_to(voice_channel)
+
             # loop music player
-            await player(voice_channel, self.channel)
+            queue = cycle(self.queue)
+            while True:
+                if self.player == None or self.channel == None or self.queue == []:
+                    try:
+                        await self.player.disconnect(force=True)
+                    except:
+                        pass
+                    break
+                if self.player.is_playing():
+                    await sleep(3)
+                    continue
+                playing = next(queue)
+                audio = discord.FFmpegPCMAudio(playing[0], options = self.options)
+                try:
+                    await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
+                except:
+                    pass
+                try:
+                    self.player.play(audio)
+                except:
+                    voice_channel = await self.connect(channel)
         except:
             traceback.print_exc()
 
     async def hololive_(self):
         try:
             self.get_songs()
+
             # join voice channel
             voice_channel = await self.connect(config.hololive_channel)
             self.channel = voice_channel
-            # loop music player
-            await player(voice_channel, config.hololive_channel)
-        except:
-            traceback.print_exc()
 
-    async def player(self, voice_channel, channel):
-        # loop music player
-        voice_channel = voice_channel
-        queue = cycle(self.queue)
-        while True:
-            if self.player == None or self.channel == None or self.queue == []:
+            # loop music player
+            queue = cycle(self.queue)
+            while True:
+                if self.player == None or self.channel == None or self.queue == []:
+                    try:
+                        await self.player.disconnect(force=True)
+                    except:
+                        pass
+                    break
+                if self.player.is_playing():
+                    await sleep(3)
+                    continue
+                playing = next(queue)
+                audio = discord.FFmpegPCMAudio(playing[0], options = self.options)
                 try:
-                    await self.player.disconnect(force=True)
+                    await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
                 except:
                     pass
-                break
-            if self.player.is_playing():
-                await sleep(3)
-                continue
-            playing = next(queue)
-            audio = discord.FFmpegPCMAudio(playing[0], options = self.options)
-            try:
-                await voice_channel.edit(name=f"{playing[1]} - Hololive Chill (24/7)")
-            except:
-                pass
-            try:
-                self.player.play(audio)
-            except:
-                voice_channel = await self.connect(channel)
+                try:
+                    self.player.play(audio)
+                except:
+                    voice_channel = await self.connect(channel)
+        except:
+            traceback.print_exc()
 
     def get_songs(self):
         # get music songs path
@@ -112,6 +131,7 @@ class Hololive(commands.Cog):
             self.queue.append(music)
 
     async def connect(self, channel:int):
+        # connect to voice channel
         try:
             voice_channel = self.client.get_channel(channel)
             self.player = await voice_channel.connect(reconnect=True, timeout=30)
