@@ -1,4 +1,4 @@
-import discord, os, threading, config, logging
+import discord, os, threading, config, logging, asyncio
 from discord.ext import commands
 from cogs import give_away
 from discord_slash import SlashCommand
@@ -43,7 +43,9 @@ async def reload(ctx, extension):
 
 def load_cogs():
     for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
+        if filename == '__init__.py':
+            continue
+        elif filename.endswith('.py'):
             client.load_extension(f'cogs.{filename[:-3]}')
             print(f'Loaded {filename}')
 
@@ -51,8 +53,10 @@ load_cogs()
 
 @client.event
 async def on_ready():
+    load_cogs()
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Hi Boss!"))
     print('[main.py] Logged in as {0} ({0.id})\nWelcome my Lord.'.format(client.user))
+    asyncio.create_task(hololive_playper.Hololive(client).hololive_())
 
 check_ga = give_away.Giveaway(discord.Client()).execute
 thread = threading.Thread(target=check_ga, args=('check_ga', ))
