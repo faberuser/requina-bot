@@ -1,4 +1,4 @@
-import discord, time, os, re, requests, re, cfscrape, asyncio, traceback
+import discord, time, os, re, requests, re, cfscrape, asyncio
 from itertools import cycle
 from lxml.html import fromstring
 from discord.ext import commands
@@ -13,11 +13,11 @@ class Sauce(commands.Cog):
     @commands.command(aliases=["source"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def sauce(self, ctx):
-        await self.replyLinks(ctx, saucenao=True, google=True, yandex=True, tineye=True, iqdb=True)
+        await self.replyLinks(ctx, saucenao=True, yandex=True, iqdb=True, iqdb3d=True, google=True, tineye=True, tracemoe=True, ascii2d=True)
 
     @commands.command(aliases=["source_"])
     async def sauce_(self, ctx):
-        await self.replyLinks(ctx, saucenao=True, google=True, yandex=True, tineye=True, iqdb=True, no_preview=True)
+        await self.replyLinks(ctx, saucenao=True, yandex=True, iqdb=True, iqdb3d=True, google=True, tineye=True, tracemoe=True, ascii2d=True, no_preview=True)
 
     @commands.command(aliases=["nao"])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -46,6 +46,15 @@ class Sauce(commands.Cog):
     async def iqdb_(self, ctx):
         await self.replyLinks(ctx, iqdb=True, no_preview=True)
 
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def iqdb3d(self, ctx):
+        await self.replyLinks(ctx, iqdb3d=True)
+
+    @commands.command()
+    async def iqdb3d_(self, ctx):
+        await self.replyLinks(ctx, iqdb3d=True, no_preview=True)
+
     @commands.command(aliases=["tin", "eye"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def tineye(self, ctx):
@@ -64,7 +73,25 @@ class Sauce(commands.Cog):
     async def google_(self, ctx):
         await self.replyLinks(ctx, google=True, no_preview=True)
 
-    async def replyLinks(self, ctx, saucenao=False, google=False, yandex=False, tineye=False, iqdb=False, no_preview=False):
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def tracemoe(self, ctx):
+        await self.replyLinks(ctx, tracemoe=True)
+
+    @commands.command()
+    async def tracemoe_(self, ctx):
+        await self.replyLinks(ctx, tracemoe=True, no_preview=True)
+
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def ascii2d(self, ctx):
+        await self.replyLinks(ctx, ascii2d=True)
+
+    @commands.command()
+    async def ascii2d_(self, ctx):
+        await self.replyLinks(ctx, ascii2d=True, no_preview=True)
+
+    async def replyLinks(self, ctx, saucenao=False, yandex=False, iqdb=False, iqdb3d=False, google=False, tineye=False, tracemoe=False, ascii2d=False, no_preview=False):
         msg = await ctx.send('Searching...')
         result = self.analyzeCommand(ctx)
 
@@ -128,7 +155,7 @@ class Sauce(commands.Cog):
                 embed.title = f":mag_right: Results from newest message has image in 50 newest messages ({index})"
 
             try:
-                embed = await self.set_fields(embed, u, saucenao, google, yandex, tineye, iqdb, no_preview)
+                embed = await self.set_fields(embed, u, saucenao, yandex, iqdb, iqdb3d, google, tineye, tracemoe, ascii2d, no_preview)
                 if len(urls) == 1:
                     await msg.edit(embed=embed, content=None)
                 else:
@@ -219,6 +246,15 @@ class Sauce(commands.Cog):
         fr = self.iqdb_first_result(url)
         return 'iqdb', f"[All Results]({url_})\n{fr}"
 
+    def iqdb3dLink(self, url: str, no_preview=False):
+        url_ = "https://3d.iqdb.org/?url={}".format(parse.quote_plus(url))
+        if url_.endswith('%0A'):
+            url_ = url_[:-3]
+        if no_preview == True:
+            return 'iqdb3d', f"[All Results]({url_})"
+        fr = self.iqdb3d_first_result(url)
+        return 'iqdb3d', f"[All Results]({url_})\n{fr}"
+
     def tineyeLink(self, url: str, no_preview=False):
         url_ = "https://www.tineye.com/search?url={}".format(parse.quote_plus(url))
         #fr = self.tineye_first_result(url_)
@@ -232,6 +268,19 @@ class Sauce(commands.Cog):
             return 'google', f"[All Results]({url_})"
         fr = self.google_first_result(url_)
         return 'google', f"[All Results]({url_})\n{fr}"
+
+    def tracemoeLink(self, url: str, no_preview=False):
+        url_ = "https://trace.moe/?auto&amp;url={}".format(parse.quote_plus(url))
+        if no_preview == True:
+            return 'tracemoe', f"[All Results]({url_})"
+        return 'tracemoe', f"[All Results]({url_})\n(╯‵□′)╯︵┻━┻"
+
+    def ascii2dLink(self, url: str, no_preview=False):
+        url_ = "https://ascii2d.net/search/url/{}".format(parse.quote_plus(url))
+        if no_preview == True:
+            return 'ascii2d', f"[All Results]({url_})"
+        return 'ascii2d', f"[All Results]({url_})\n(╯‵□′)╯︵┻━┻"
+
 
     def sauce_first_result(self, url: str):
         def get_basic_html():
@@ -345,7 +394,6 @@ class Sauce(commands.Cog):
             data = {'url': url}
             html = requests.post('https://www.iqdb.org', data=data, timeout=10.0).text
         except:
-            traceback.print_exc()
             return "Can't get first result."
         nomatch = BeautifulSoup(html, 'html.parser').find_all('div', {'class': 'nomatch'})
         if nomatch != []:
@@ -363,10 +411,33 @@ class Sauce(commands.Cog):
                 return "Can't get first result."
             return f"__Best match__\n[{text}]({url_})"
         except:
-            traceback.print_exc()
             return "Can't get first result."
 
-    async def tineye_first_result(self, url: str):
+    def iqdb3d_first_result(self, url: str):
+        try:
+            data = {'url': url}
+            html = requests.post('https://3d.iqdb.org', data=data, timeout=10.0).text
+        except:
+            return "Can't get first result."
+        nomatch = BeautifulSoup(html, 'html.parser').find_all('div', {'class': 'nomatch'})
+        if nomatch != []:
+            return "No relevant matches."
+        pages = BeautifulSoup(html, 'html.parser').find_all('div', {'class': 'pages', 'id': 'pages'})
+        if pages == []:
+            return "File to large."
+        bm = BeautifulSoup(str(pages), 'html.parser').find_all('td', {'class': 'image'})
+        try:
+            url_ = BeautifulSoup(str(bm[1]), 'html.parser').find('a').get('href')
+            if 'http' not in url_:
+                url_ = 'https:'+url_
+            text = re.search(f"{'//'}(.*?){'/'}", url_).group(1)
+            if url_ is None or text is None:
+                return "Can't get first result."
+            return f"<u>First Result</u><br><a href='{url_}' target='_blank' rel='noopener noreferrer'>{text}</a>"
+        except:
+            return "Can't get first result."
+
+    def tineye_first_result(self, url: str):
         # the site need to render javascript but also having bot protection
         # javascript render can use requests_html
         # cfscrape can deal with bot protection
@@ -419,12 +490,12 @@ class Sauce(commands.Cog):
         except:
             return "Can't get first result."
 
-    async def set_fields(self, embed, u, saucenao=False, google=False, yandex=False, tineye=False, iqdb=False, no_preview=False):
+    async def set_fields(self, embed, u, saucenao=False, yandex=False, iqdb=False, iqdb3d=False, google=False, tineye=False, tracemoe=False, ascii2d=False, no_preview=False):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
-            engines = [saucenao, yandex, iqdb, tineye, google]
-            excs = [self.sauceLink, self.yandexLink, self.iqdbLink, self.tineyeLink, self.googleLink]
-            for i in range(0, 5):
+            engines = [saucenao, yandex, iqdb, iqdb3d, google, tineye, tracemoe, ascii2d]
+            excs = [self.sauceLink, self.yandexLink, self.iqdbLink, self.iqdb3dLink, self.googleLink, self.tineyeLink, self.tracemoeLink, self.ascii2dLink]
+            for i in range(0, 8):
                 if engines[i] == True:
                     if no_preview == True:
                         futures.append(executor.submit(excs[i], u, True))
@@ -448,7 +519,7 @@ class Sauce(commands.Cog):
                         results.remove(result)
                     else:
                         continue
-            engine_list = ['SauceNAO', 'Yandex', 'IQDB', 'TinEye', 'Google']
+            engine_list = ['SauceNAO', 'Yandex', 'IQDB', 'IQDB3D', 'Google', 'TinEye', 'TraceMoe', 'ASCII2D']
             for engine_ in engine_list:
                 add_field_(engine_)
         return embed
@@ -459,7 +530,7 @@ class Sauce(commands.Cog):
 
     async def sauce_embed(self, embed):
         embed.set_footer(text=embed.footer.text[:-15])
-        embed = await self.set_fields(embed, embed.image.url, saucenao=True, google=True, yandex=True, tineye=True, iqdb=True)
+        embed = await self.set_fields(embed, embed.image.url, saucenao=True, yandex=True, iqdb=True, iqdb3d=True, google=True, tineye=True, tracemoe=True, ascii2d=True)
         return embed
 
     def timeout_embed(self, embed):
