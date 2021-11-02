@@ -213,7 +213,7 @@ class Sauce(commands.Cog):
         return urls
 
     def is_url_image(self, url:str):
-        image_formats = ["image/png", "image/jpeg", "image/jpg"]
+        image_formats = ["image/png", "image/jpeg", "image/jpg", "image/gif"]
         r = requests.get(url, timeout=10.0)
         if r.headers["content-type"] in image_formats:
             return True
