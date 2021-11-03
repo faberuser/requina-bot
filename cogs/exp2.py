@@ -13,7 +13,9 @@ class Hello(commands.Cog):
             await channel.send('Huh, really...?!')
 
             def check(m):
-                return m.content == str('um') and m.channel == channel or m.content == str('Um') and m.channel == channel or m.content == str('Umm') and m.channel == channel or m.content == str('umm') and m.channel == channel or m.content == str('Uhm') and m.channel == channel or m.content == str('uhm') and m.channel == channel or m.content == str('yes') and m.channel == channel or m.content == str('Yes') and m.channel == channel
+                return m.content.lower().startswith() == str('um') and m.channel == channel or \
+                    m.content.lower().startswith() == str('uhm') and m.channel == channel or \
+                        m.content.lower().startswith() == str('yes') and m.channel == channel
 
             msg = await self.client.wait_for('message', check=check)
             if message.author.id in config.owners:
