@@ -75,7 +75,7 @@ class Emoji(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def buffluck(self, ctx, *, guy):
         if guy:
-            await ctx.send(f'{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.randrange(1,100,1)}%*')
+            await ctx.send(f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '-'])}{random.randrange(1,100,1)}%*")
         else:
             await ctx.send('Who ?')
 
