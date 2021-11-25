@@ -72,7 +72,7 @@ class Emoji(commands.Cog):
         await ctx.send("<:stare:624993223420542976> ")
 
     @commands.command(aliases=['buff'])
-    @commands.cooldown(1, 30, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def buffluck(self, ctx, *, guy):
         if guy:
             await ctx.send(f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '-'])}{random.randrange(1,100,1)}%*")
@@ -80,7 +80,7 @@ class Emoji(commands.Cog):
             await ctx.send('Who ?')
 
     @commands.command(aliases=['debuff', 'tach', 'neft', 'neftluck', 'nerf', 'nerfluck'])
-    @commands.cooldown(1, 30, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def debuffluck(self, ctx, *, guy):
         if guy:
             await ctx.send(f'<:WorryTachTachTach:697835039987073114> {guy} *Luck is decreased by {random.randrange(1,101,1)}%*')
@@ -88,7 +88,7 @@ class Emoji(commands.Cog):
             await ctx.send('Who ?')
 
     @commands.command()
-    @commands.cooldown(1, 30, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def rip(self, ctx, *, guy):
         await ctx.send(f'<:WorryRip:697835039697666088> {guy}')
 

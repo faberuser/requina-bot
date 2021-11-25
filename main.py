@@ -16,7 +16,7 @@ logging.basicConfig(
 
 @client.command()
 async def load(ctx, extension):
-    if ctx.author.id == 470081764271063060 or ctx.author.id == 315724989057990663:
+    if ctx.author.id not in config.owners:
         try:
             client.load_extension(f'cogs.{extension}')
             await ctx.send('Loaded `' + extension + '.py`')
@@ -25,7 +25,7 @@ async def load(ctx, extension):
 
 @client.command()
 async def unload(ctx, extension):
-    if ctx.author.id == 470081764271063060 or ctx.author.id == 315724989057990663:
+    if ctx.author.id not in config.owners:
         try:
             client.unload_extension(f'cogs.{extension}')
             await ctx.send('Unloaded `' + extension + '.py`')
@@ -34,7 +34,7 @@ async def unload(ctx, extension):
 
 @client.command()
 async def reload(ctx, extension):
-    if ctx.author.id == 470081764271063060 or ctx.author.id == 315724989057990663:
+    if ctx.author.id not in config.owners:
         try:
             client.reload_extension(f'cogs.{extension}')
             await ctx.send('Reloaded `' + extension + '.py`')
