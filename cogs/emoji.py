@@ -1,5 +1,6 @@
-import discord
-import random
+import discord, random, json, asyncio
+from datetime import datetime
+import datetime as dt
 from discord.ext import commands
 
 client = discord.Client()
@@ -72,25 +73,85 @@ class Emoji(commands.Cog):
         await ctx.send("<:stare:624993223420542976> ")
 
     @commands.command(aliases=['buff'])
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    # @commands.cooldown(1, 60, commands.BucketType.user)
     async def buffluck(self, ctx, *, guy):
-        if guy:
-            await ctx.send(f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '-'])}{random.randrange(1,100,1)}%*")
+        re = self.limit_check('./data/buff_limit.json', ctx.author.id, 'buff')
+        if re == True:
+            if guy:
+                await ctx.send(f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '-'])}{random.randrange(1,100,1)}%*")
+            else:
+                await ctx.send('Who ?')
         else:
-            await ctx.send('Who ?')
+            msg = await ctx.send(re)
+            await ctx.message.delete()
+            await asyncio.sleep(10)
+            await msg.delete()
 
     @commands.command(aliases=['debuff', 'tach', 'neft', 'neftluck', 'nerf', 'nerfluck'])
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    # @commands.cooldown(1, 60, commands.BucketType.user)
     async def debuffluck(self, ctx, *, guy):
-        if guy:
-            await ctx.send(f'<:WorryTachTachTach:697835039987073114> {guy} *Luck is decreased by {random.randrange(1,101,1)}%*')
+        re = self.limit_check('./data/nerf_limit.json', ctx.author.id, 'nerf')
+        if re == True:
+            if guy:
+                await ctx.send(f'<:WorryTachTachTach:697835039987073114> {guy} *Luck is decreased by {random.randrange(1,101,1)}%*')
+            else:
+                await ctx.send('Who ?')
         else:
-            await ctx.send('Who ?')
+            msg = await ctx.send(re)
+            await ctx.message.delete()
+            await asyncio.sleep(10)
+            await msg.delete()
 
     @commands.command()
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def rip(self, ctx, *, guy):
-        await ctx.send(f'<:WorryRip:697835039697666088> {guy}')
+        re = self.limit_check('./data/rip_limit.json', ctx.author.id, 'rip')
+        if re == True:
+            if guy:
+                await ctx.send(f'<:WorryRip:697835039697666088> {guy}')
+            else:
+                await ctx.send('Who ?')
+        else:
+            msg = await ctx.send(re)
+            await ctx.message.delete()
+            await asyncio.sleep(10)
+            await msg.delete()
+
+    def limit_check(self, file, id, act):
+        with open(file) as r:
+            re = json.load(r)
+        had = False
+        for user in re:
+            if str(id) == user:
+                had = True
+        if had == False:
+            re[str(id)] = {
+                'times': 0,
+                'time': None
+            }
+            with open(file, 'w') as w:
+                json.dump(re, w, indent=4)
+        with open(file) as f:
+            re = json.load(f)
+        for user in re:
+            if str(id) == user:
+                if re[user]['time'] is not None:
+                    limit_time = datetime.strptime(re[user]['time'], "%d/%m/%y %H:%M:%S")
+                    if limit_time > datetime.now():
+                        return f"You have used 3 times {act} limited today (you can use again after {re[user]['time']})."
+                    else:
+                        re[user]['time'] = None
+                        re[user]['times'] = 1
+                        with open(file, 'w') as w:
+                            json.dump(re, w, indent=4)
+                else:
+                    re[user]['times'] += 1
+                    if re[user]['times'] > 2:
+                        re[user]['time'] = (datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")
+                    with open(file, 'w') as w:
+                        json.dump(re, w, indent=4)
+        return True
+
 
 def setup(client):
     client.add_cog(Emoji(client))
