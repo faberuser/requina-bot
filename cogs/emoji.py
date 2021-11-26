@@ -73,7 +73,7 @@ class Emoji(commands.Cog):
         await ctx.send("<:stare:624993223420542976> ")
 
     @commands.command(aliases=['buff'])
-    # @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def buffluck(self, ctx, *, guy):
         re = self.limit_check('./data/buff_limit.json', ctx.author.id, 'buff')
         if re == True:
@@ -88,7 +88,7 @@ class Emoji(commands.Cog):
             await msg.delete()
 
     @commands.command(aliases=['debuff', 'tach', 'neft', 'neftluck', 'nerf', 'nerfluck'])
-    # @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def debuffluck(self, ctx, *, guy):
         re = self.limit_check('./data/nerf_limit.json', ctx.author.id, 'nerf')
         if re == True:
