@@ -103,7 +103,7 @@ class Emoji(commands.Cog):
             await msg.delete()
 
     @commands.command()
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    # @commands.cooldown(1, 60, commands.BucketType.user)
     async def rip(self, ctx, *, guy):
         re = self.limit_check('./data/rip_limit.json', ctx.author.id, 'rip')
         if re == True:
@@ -126,7 +126,11 @@ class Emoji(commands.Cog):
                 had = True
         if had == False:
             re[str(id)] = {
-                'times': 0,
+                'times': {
+                    "0": str((datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")),
+                    "1": "",
+                    "2": ""
+                },
                 'time': None
             }
             with open(file, 'w') as w:
@@ -141,13 +145,28 @@ class Emoji(commands.Cog):
                         return f"You have used 3 times {act} limited today (you can use again after {re[user]['time']})."
                     else:
                         re[user]['time'] = None
-                        re[user]['times'] = 1
+                        re[user]['times'] = {
+                            "0": str((datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")),
+                            "1": "",
+                            "2": ""
+                        }
                         with open(file, 'w') as w:
                             json.dump(re, w, indent=4)
                 else:
-                    re[user]['times'] += 1
-                    if re[user]['times'] > 2:
-                        re[user]['time'] = (datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")
+                    if datetime.strptime(re[user]['times']['0'], "%d/%m/%y %H:%M:%S") < datetime.now():
+                        re[user]['times']['0'] = (datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")
+                        re[user]['times']['1'] = ""
+                        re[user]['times']['2'] = ""
+                    else:
+                        if had == True:
+                            count = 0
+                            for time in re[user]['times']:
+                                count += 1
+                                if re[user]['times'][time] == '':
+                                    re[user]['times'][time] = (datetime.now()+dt.timedelta(days=1)).strftime("%d/%m/%y %H:%M:%S")
+                                    break
+                            if count >= 3:
+                                re[user]['time'] = re[user]['times']['0']
                     with open(file, 'w') as w:
                         json.dump(re, w, indent=4)
         return True
