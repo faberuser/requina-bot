@@ -10,6 +10,8 @@ client = discord.Client()
 class Tenor_Gif(commands.Cog):
     def __init__(self, client):
         self.client = client
+        if os.path.exists('./data/tenor_media') == False:
+            os.mkdir('./data/tenor_media')
 
     @commands.Cog.listener()
     async def on_message(self, message):

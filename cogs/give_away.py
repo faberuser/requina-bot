@@ -25,6 +25,8 @@ class Giveaway(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.check_ga_loop.start()
+        if os.path.exists('./data/ga_end') == False:
+            os.mkdir('./data/ga_end')
 
     @tasks.loop(count=1)
     async def check_ga_loop(self):
