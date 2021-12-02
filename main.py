@@ -1,4 +1,4 @@
-import discord, os, config, logging, asyncio, config_test
+import discord, os, config, logging, asyncio
 from discord.ext import commands
 from discord_slash import SlashCommand
 
@@ -57,4 +57,4 @@ async def on_ready():
     print('Logged in as {0} ({0.id})\nWelcome my Lord.'.format(client.user))
 
 
-client.run(config_test.token, reconnect=True, bot=True)
+client.run(config.token, reconnect=True, bot=True)
