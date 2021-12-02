@@ -6,33 +6,98 @@ channel_ids = [641996130262974474, 718434254832402474, 825591043831234580]
 # Decreased won users rate (>1)
 rate = 2
 
-import discord, random, os, re, time, threading, pickle, asyncio
+import discord, random, os, re, time, threading, pickle, asyncio, config
 from datetime import datetime
 from discord.ext import commands
 
 client = discord.Client()
 
+asyncio.create_task(check_ga())
+
+# check_ga = Giveaway(client).execute
+# thread = threading.Thread(target=check_ga, args=('check_ga', ))
+# thread.name = 'check_ga'
+# thread.daemon = True
+# thread.start()
+
+async def check_ga():
+    ga_s = []
+    for file in os.listdir('./data/ga_end'):
+        with open(f'./data/ga_end/{file}') as f:
+            lines = f.readlines()
+        if lines[5] == 'not':
+            try:
+                channel = client.get_channel(int(lines[0]))
+                msg = await channel.fetch_message(int(lines[1]))
+            except Exception as e:
+                print("Failed to check_ga.")
+                print(e)
+            decrease_rate, no_won = False, False
+            if lines[3] == 'True':
+                decrease_rate=True
+            if lines[4] == 'True':
+                no_won=True
+            ga_s.append([file, msg, decrease_rate, no_won])
+    if ga_s != []:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            exc = tasks
+            for ga in ga_s:
+                futures.append(executor.submit(exc, ga[0], ga[1], ga[2], ga[3]))
+            await asyncio.sleep(5)
+            while True:
+                if futures == []:
+                    print('No GA left!')
+                    break
+                else:
+                    for future in futures:
+                        if future._state == 'FINISHED':
+                            re = future.result()
+                            print(f"'{re[0]}' FINISHED")
+                            try:
+                                users = await Giveaway(client).users(msg, re[3], re[0])
+                                if users == []:
+                                    return
+                                embed, content = Giveaway(client).roll_(users, re[1], re[2])
+                                await re[1].edit(embed=embed)
+                                await re[1].channel.send(content)
+                                with open(f'./data/ga_end/{re[0]}', 'r') as f:
+                                    re_ = f.read()
+                                with open(f'./data/ga_end/{re[0]}', 'w') as r:
+                                    r.write(re_.replace('not', 'done'))
+                            except Exception as e:
+                                print("Failed to result.")
+                                print(e)
+                                pass
+                            futures.remove(future)
+                        else:
+                            pass
+                    await asyncio.sleep(60)
+    else:
+        print('No GA left!')
+
+def tasks(file, msg, decrease_rate:bool, no_won:bool):
+    while True:
+        try:
+            with open(f'./data/ga_end/{file}', 'r') as f:
+                re = f.read()
+                re_ = re.splitlines()
+                end_time = datetime.strptime(re_[2], '%H:%M-%d/%m/%Y')
+            print(f"Checking for Give Away '{file}': '{re_[2]}' at {datetime.now().strftime('%H:%M-%d/%m/%Y')}")
+        except ValueError:
+            print('Error. Time data does not match format `HH:mm-dd/MM/yyyy` or `%H:%M-%d/%m/%Y`. This task has been canceled.')
+            break
+        current_time = datetime.now()
+        if current_time >= end_time:
+            print(f"'{file}' Matched!")
+            return [file, msg, decrease_rate, no_won]
+        else:
+            print(f"'{file}' Not match.")
+            time.sleep(60)
+
 class Giveaway(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-
-	@commands.command()
-	async def check_ga(self, ctx):
-		if ctx.author.id == 470081764271063060 or ctx.author.id == 315724989057990663:
-			started = False
-			for thread in threading.enumerate():
-				if thread.name == 'check_ga':
-					started = True
-					break
-			if started == False:
-				msg = await ctx.send('Starting thread checking not finished GA.')
-				thread = threading.Thread(target=self.execute, args=('check_ga', ))
-				thread.name = 'check_ga'
-				thread.daemon = True
-				thread.start()
-				await msg.edit(content='Thread started.')
-			else:
-				await ctx.send('Thread already running.')
 
 	# Gievaway embed command
 	@commands.command(pass_context=True)
@@ -306,17 +371,20 @@ class Giveaway(commands.Cog):
 							pass
 						else:
 							continue
-				try:
-					with open('./data/winner', 'w') as f:
-						f.write(str(guild.id)+'\n'+str(winner.id))
-				except FileNotFoundError:
-					open('./data/winner', 'a').close()
-				thread = threading.Thread(target=self.execute, args=('fetch_member', ))
-				thread.daemon = True
-				thread.start()
-				thread.join()
-				with open('./data/winner', 'rb') as r:
-					roles = pickle.load(r)
+				# try:
+				# 	with open('./data/winner', 'w') as f:
+				# 		f.write(str(guild.id)+'\n'+str(winner.id))
+				# except FileNotFoundError:
+				# 	open('./data/winner', 'a').close()
+				# thread = threading.Thread(target=self.execute, args=('fetch_member', ))
+				# thread.daemon = True
+				# thread.start()
+				# thread.join()
+				# with open('./data/winner', 'rb') as r:
+				# 	roles = pickle.load(r)
+
+				roles = asyncio.create_task(self.get_member(guild.id, winner.id))
+				
 				val = False
 				for role_ in roles:
 					if role.id == role_:
@@ -349,6 +417,18 @@ class Giveaway(commands.Cog):
 			f.write(str(winner.id)+'\n')
 		return [embed, content]
 	
+	async def get_member(self, guild, winner):
+		try:
+			guild = await client.fetch_guild(guild)
+			member = await guild.fetch_member(winner)
+			roles_ = []
+			for role in member.roles:
+				roles_.append(role.id)
+			return roles_
+		except Exception as e:
+			print('Failed to fetch member\n')
+			print(e)
+
 	def decreased_winners(self):
 		winners = []
 		try:

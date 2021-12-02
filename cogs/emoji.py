@@ -103,7 +103,7 @@ class Emoji(commands.Cog):
             await msg.delete()
 
     @commands.command()
-    # @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def rip(self, ctx, *, guy):
         re = self.limit_check('./data/rip_limit.json', ctx.author.id, 'rip')
         if re == True:

@@ -1,6 +1,5 @@
-import discord, os, threading, config, logging, asyncio
+import discord, os, config, logging, asyncio
 from discord.ext import commands
-from cogs import give_away
 from discord_slash import SlashCommand
 
 client = commands.Bot(command_prefix=config.prefix, case_insensitive=True)
@@ -55,11 +54,5 @@ load_cogs()
 async def on_ready():
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Hi Boss!"))
     print('[main.py] Logged in as {0} ({0.id})\nWelcome my Lord.'.format(client.user))
-
-check_ga = give_away.Giveaway(discord.Client()).execute
-thread = threading.Thread(target=check_ga, args=('check_ga', ))
-thread.name = 'check_ga'
-thread.daemon = True
-thread.start()
 
 client.run(config.token, reconnect=True, bot=True)
