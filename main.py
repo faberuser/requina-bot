@@ -1,7 +1,8 @@
-import discord, os, config, logging, asyncio
+import discord, os, config, logging, asyncio, config_test
 from discord.ext import commands
 from discord_slash import SlashCommand
 
+client = discord.Client()
 client = commands.Bot(command_prefix=config.prefix, case_insensitive=True)
 client.remove_command('help')
 slash = SlashCommand(client, sync_commands=True, sync_on_cog_reload=True, delete_from_unused_guilds=True)
@@ -53,6 +54,7 @@ load_cogs()
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Hi Boss!"))
-    print('[main.py] Logged in as {0} ({0.id})\nWelcome my Lord.'.format(client.user))
+    print('Logged in as {0} ({0.id})\nWelcome my Lord.'.format(client.user))
 
-client.run(config.token, reconnect=True, bot=True)
+
+client.run(config_test.token, reconnect=True, bot=True)
