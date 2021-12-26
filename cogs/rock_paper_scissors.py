@@ -14,7 +14,7 @@ class Rock_Paper_Scissors(commands.Cog):
 
     @cog_ext.cog_slash(name='rpc',
                     description="Play Rock Paper Scissors with another member",
-                    guild_ids=[652813007981772801],
+                    guild_ids=[652813007981772801, 213557352782233601],
                     options=[
                         create_option(name='member', description='Inpput a member', option_type=6, required=True)
                     ]) # slash ut 4 command
