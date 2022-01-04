@@ -1,6 +1,8 @@
-import discord, asyncio
+import discord, asyncio, aiohttp, config
 from discord.ext import commands
 from cogs import sauce
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 class Embed(commands.Cog):
 
@@ -52,6 +54,61 @@ class Embed(commands.Cog):
             timeout_embed_ = sauce.Sauce(self.client).timeout_embed(embed)
             await msg.edit(embed=timeout_embed_)
 
+    @cog_ext.cog_slash(
+                    name='avatar',
+                    description="Get an avatar from a member",
+                    guild_ids=[652813007981772801, 213557352782233601],
+                    options=[
+                        create_option(name='member', description='Inpput a member', option_type=6, required=False)
+                    ])
+    async def avatar_(self, ctx: SlashContext, *, member:discord.Member = None):
+        if member is not None:
+            au = member
+        if member is None:
+            au = ctx.author
+        url_ = au.avatar_url
+        embed = discord.Embed(title=f"{au}")
+        embed.set_image(url=url_)
+        embed.set_footer(text=f"Requested by: {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed, hidden=True)
+
+    @cog_ext.cog_slash(
+                    name='banner',
+                    description=f"An aliase of user banner",
+                    guild_ids=[652813007981772801, 213557352782233601],
+                    options=[
+                        create_option(name='member', description='Inpput a member', option_type=6, required=False)
+                    ])
+    async def banner_(self, ctx: SlashContext, *, member:discord.Member = None):
+        if member is not None:
+            user_id = member.id
+            au = member
+        if member is None:
+            user_id = ctx.author.id
+            au = ctx.author
+
+        resolution = 1024
+        endpoints = (
+            "https://cdn.discordapp.com/banners/",
+            "https://discord.com/api/v9/users/{}".format(user_id)
+        )
+
+        headers = {
+            "Authorization": f"Bot {config.token}"
+        }
+
+        embed = discord.Embed(title=f"{au}")
+        embed.set_footer(text=f"Requested by: {ctx.author}", icon_url=ctx.author.avatar_url)
+
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(endpoints[1]) as response:
+                data = await response.json()
+                try:
+                    url = endpoints[0] + str(user_id) + "/" + data["banner"] + "?size={0}".format(resolution)
+                    embed.set_image(url=url)
+                    await ctx.send(embed=embed, hidden=True)
+                except:
+                    await ctx.send('User has no banner', hidden=True)
 
 def setup(client):
     client.add_cog(Embed(client))
