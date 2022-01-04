@@ -1,13 +1,6 @@
 # SETUP
 # Config emoji (format: <:<emoji_name>:<emoji_id>>)
-import concurrent
-import asyncio
-import pickle
-import time
-import re
-import os
-import random
-import discord
+import concurrent, asyncio, aiohttp, pickle, time, re, os, random, discord, config
 from discord.ext import tasks, commands
 from datetime import datetime
 emoji = '<:party:652813264614326313>'
@@ -68,19 +61,21 @@ class Giveaway(commands.Cog):
                 except Exception as e:
                     print("Failed to check_ga.")
                     print(e)
-                decrease_rate, no_won = False, False
+                decrease_rate, no_won, nitroed = False, False, False
                 if lines[3] == 'True':
                     decrease_rate = True
                 if lines[4] == 'True':
                     no_won = True
-                ga_s.append([file, msg, decrease_rate, no_won])
+                if lines[5] == 'True':
+                    nitroed = True
+                ga_s.append([file, msg, decrease_rate, no_won, nitroed])
         if ga_s != []:
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = []
                 exc = self.tasks_
                 for ga in ga_s:
                     futures.append(executor.submit(
-                        exc, ga[0], ga[1], ga[2], ga[3]))
+                        exc, ga[0], ga[1], ga[2], ga[3], ga[4]))
                 await asyncio.sleep(5)
                 while True:
                     if futures == []:
@@ -92,7 +87,7 @@ class Giveaway(commands.Cog):
                                 re = future.result()
                                 print(f"'{re[0]}' FINISHED")
                                 try:
-                                    users = await self.users(msg, re[3], re[0])
+                                    users = await self.users(msg, re[3], re[4], re[0])
                                     if users == []:
                                         return
                                     embed, content = await self.roll_(users, re[1], re[2])
@@ -120,10 +115,11 @@ class Giveaway(commands.Cog):
         if text is None:
             embed = discord.Embed(
                 title='Give Away Command',
-                description='''Syntax:\n`r.ga title=<title>, description=<description>, role=<@role>/leave_blank, time=<end_time>/leave_blank, no_won=False, decrease_rate=False`\n
+                description='''Syntax:\n`r.ga title=<title>, description=<description>, role=<@role>/leave_blank, time=<end_time>/leave_blank, no_won=False, nitroed=False, decrease_rate=False`\n
 				Time format: `HH:mm-dd/MM/yyyy` (24 hour based hour with 0 prefix, minute without 0 prefix, day with 0 prefix, month with 0 prefix, represents full year)
 				Time format example: `02:30-19/09/2019` or `20:00-20/02/2020`.
 				`no_won`: Excludes won users from the GA. Default sets to False.
+                `nitroed`: Excludes users alreading having nitro from the GA. Default sets to False.
 				`decrease_rate`: Decreases winning rate of the won users. Default sets to False.\n
 				Example: `r.ga title=Nitro, description=1 Month, role= @Nitro , time=20:00-20/02/2020`''',
                 colour=discord.Colour.from_rgb(
@@ -131,7 +127,7 @@ class Giveaway(commands.Cog):
             )
             await ctx.send(embed=embed)
         if text is not None:
-            tit, des, role, author, time, decrease_rate, no_won = None, None, None, None, None, None, None
+            tit, des, role, author, time, decrease_rate, no_won, nitroed = None, None, None, None, None, None, None, None
             text = f'{text},'
             # Remove 5 lines below to remove giveaway channel
             if ctx.channel.id not in channel_ids:
@@ -139,6 +135,7 @@ class Giveaway(commands.Cog):
                 return
             else:
                 pass
+
             ###
             try:  # embed title aka prize
                 if 'title=' in text:
@@ -150,6 +147,7 @@ class Giveaway(commands.Cog):
                     tit = tit.replace('<nitro>', '<:nitro:652813266493374484>')
             except:
                 pass
+
             try:  # embed description
                 if 'description=' in text:
                     des = self.find(text, 'description=', ',')
@@ -157,6 +155,7 @@ class Giveaway(commands.Cog):
                     des = self.find(text, 'description =', ',')
             except:
                 pass
+
             try:  # given role
                 if 'role=' in text:
                     role_ = self.find(text, 'role=', ',')
@@ -173,6 +172,7 @@ class Giveaway(commands.Cog):
                 role = role__.mention
             except:
                 pass
+
             try:  # get time
                 if 'time=' in text:
                     time = self.find(text, 'time=', ',')
@@ -188,6 +188,7 @@ class Giveaway(commands.Cog):
                 time.sleep(10)
                 await msg.delete()
                 return
+
             try:  # get author
                 if 'author=' in text:
                     author_ = self.find(text, 'author=', ',')
@@ -200,6 +201,7 @@ class Giveaway(commands.Cog):
                 author = self.client.get_user(int(author_))
             except:
                 pass
+
             try:  # get no_won bool
                 if 'no_won=' in text:
                     no_won = self.find(text, 'no_won=', ',')
@@ -214,7 +216,24 @@ class Giveaway(commands.Cog):
                 else:
                     no_won = False
             except:
-                decrease_rate = False
+                no_won = False
+
+            try:  # get no_won bool
+                if 'nitroed=' in text:
+                    nitroed = self.find(text, 'nitroed=', ',')
+                    if ' ' in nitroed:
+                        nitroed = nitroed.replace(' ', '')
+                elif 'nitroed =' in text:
+                    nitroed = self.find(text, 'nitroed =', ',')
+                    if ' ' in nitroed:
+                        nitroed = nitroed.replace(' ', '')
+                if nitroed == 'True':
+                    nitroed = True
+                else:
+                    nitroed = False
+            except:
+                nitroed = False
+
             try:  # get decrease_rate bool
                 if 'decrease_rate=' in text:
                     decrease_rate = self.find(text, 'decrease_rate=', ',')
@@ -238,6 +257,7 @@ class Giveaway(commands.Cog):
                 time_ = f'\nKết thúc lúc {time}.'  # time
             else:
                 time_ = ''
+
             embed = discord.Embed(
                 title=f'{tit}',
                 description=des+req,
@@ -260,17 +280,17 @@ class Giveaway(commands.Cog):
             await ctx.message.delete()
             if time is not None:
                 file = self.create_file(
-                    msg.channel.id, msg.id, time, decrease_rate, no_won)
-                re = await self.task(file, decrease_rate, no_won)
+                    msg.channel.id, msg.id, time, decrease_rate, no_won, nitroed)
+                re = await self.task(file, decrease_rate, no_won, nitroed)
                 await ctx.send(re)
 
     # Roll command
     @commands.command(pass_context=True)
-    async def roll(self, ctx, msg_id: int = None, no_won: bool = None, decrease_rate: bool = None, *, time: str = None):
+    async def roll(self, ctx, msg_id: int = None, no_won: bool = False, nitroed: bool = False, decrease_rate: bool = False, *, time: str = None):
         if msg_id is None:
             embed = discord.Embed(
                 title='Roll Commad',
-                description='''Syntax:\n`r.roll <message_id> no_won=False decrease_rate=False <end_time>/leave_blank`\n
+                description='''Syntax:\n`r.roll <message_id> no_won=False nitroed=False decrease_rate=False <end_time>/leave_blank`\n
 				Time format same as `/ga`. This command must be used in the same channel with the Giveaway embed message.''',
                 colour=discord.Colour.from_rgb(
                     223, 165, 210),  # A gei embed color
@@ -278,44 +298,29 @@ class Giveaway(commands.Cog):
             await ctx.send(embed=embed)
         else:
             msg = await ctx.channel.fetch_message(msg_id)
-            users = await self.users(msg, no_won)
+            users = await self.users(msg, no_won, nitroed)
             if users == []:
                 await ctx.message.delete()
                 return
             else:
                 pass
-            if decrease_rate is True or decrease_rate is False:  # with given decrease_rate
-                if time is None:  # end the giveaway with message's id if time isn't given
-                    await ctx.message.delete()
-                    re = await self.roll_(users, msg, decrease_rate)
-                    await msg.edit(embed=re[0])
-                    await ctx.send(re[1])
-                else:  # create timer for giveaway and given time
-                    await ctx.message.delete()
-                    file = self.create_file(
-                        ctx.channel.id, msg_id, time, decrease_rate, no_won)
-                    msg_ = await ctx.send('ok')
-                    await asyncio.sleep(1)
-                    await msg_.delete()
-                    re = await self.task(file, decrease_rate, no_won)
-                    await ctx.send(re)
-            elif decrease_rate is None:  # end the giveaway with message's id, no given decreases_rate and time
+            if time is None:  # end the giveaway with message's id if time isn't given
                 await ctx.message.delete()
-                re = await self.roll_(users, msg, False)
+                re = await self.roll_(users, msg, decrease_rate)
                 await msg.edit(embed=re[0])
                 await ctx.send(re[1])
-            else:  # create timer for giveaway if there is no given decrease_rate but has given time
+            else:  # create timer for giveaway and given time
                 await ctx.message.delete()
                 file = self.create_file(
-                    ctx.channel.id, msg_id, time, False, no_won)
+                    ctx.channel.id, msg_id, time, decrease_rate, no_won, nitroed)
                 msg_ = await ctx.send('ok')
                 await asyncio.sleep(1)
                 await msg_.delete()
-                re = await self.task(file, False, no_won)
+                re = await self.task(file, decrease_rate, no_won, nitroed)
                 await ctx.send(re)
 
     # Loop checking time
-    async def task(self, file, decrease_rate: bool, no_won: bool):
+    async def task(self, file, decrease_rate: bool, no_won: bool, nitroed: bool):
         while True:
             try:
                 with open(f'./data/ga_end/{file}', 'r') as f:
@@ -333,7 +338,7 @@ class Giveaway(commands.Cog):
                 print(f"'{file}' Matched!")
                 chan = self.client.get_channel(int(re_[0]))
                 msg = await chan.fetch_message(int(re_[1]))
-                users = await self.users(msg, no_won, file)
+                users = await self.users(msg, no_won, nitroed, file)
                 if users == []:
                     return
                 embed, content = await self.roll_(users, msg, decrease_rate)
@@ -346,7 +351,7 @@ class Giveaway(commands.Cog):
                 pass
             await asyncio.sleep(60)
 
-    async def users(self, msg, no_won: bool, file=None):
+    async def users(self, msg, no_won: bool, nitroed: bool, file=None):
         users = []
         try:
             for reaction in msg.reactions:
@@ -360,8 +365,8 @@ class Giveaway(commands.Cog):
                 else:
                     pass
         except Exception as e:
-            print(e)
             return
+
         if no_won is True:  # removes won user from the list
             users_ = users
             users = []
@@ -371,6 +376,17 @@ class Giveaway(commands.Cog):
                     if str(user.id) in winners:
                         continue
                     users.append(user)
+
+        if nitroed is True: # removes users already having nitro from the list
+            users_ = users
+            users = []
+            for user in users_:
+                try:
+                    if await self.guess_user_nitro_status(user) == False:
+                        users.append(user)
+                except:
+                    users.append(user)
+
         if users == [] or users == None:
             print('No user reacted, passed GA.')
             if file is not None:
@@ -381,6 +397,34 @@ class Giveaway(commands.Cog):
                 with open(f'./data/ga_end/{file}', 'w') as r:
                     r.write(re.replace('not', 'done'))
         return users
+
+    async def guess_user_nitro_status(self, user: discord.User or discord.Member):
+        if isinstance(user, discord.Member):
+            has_emote_status = any([a.emoji.is_custom_emoji() for a in user.activities if getattr(a, 'emoji', None)])
+            return any([user.is_avatar_animated(), has_emote_status, user.premium_since, await self.banner_s(user)])
+        return any([user.is_avatar_animated(), await self.banner_s(user)])
+
+    async def banner_s(self, user):
+        user_id = user.id
+        au = user
+
+        resolution = 1024
+        endpoints = (
+            "https://cdn.discordapp.com/banners/",
+            "https://discord.com/api/v9/users/{}".format(user_id)
+        )
+        headers = {
+            "Authorization": f"Bot {config.token}"
+        }
+
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(endpoints[1]) as response:
+                data = await response.json()
+                try:
+                    url = endpoints[0] + str(user_id) + "/" + data["banner"] + "?size={0}".format(resolution)
+                    return True
+                except:
+                    return False
 
     async def roll_(self, users, msg, decrease_rate: bool):
         guild = msg.channel.guild
@@ -412,16 +456,18 @@ class Giveaway(commands.Cog):
                 else:
                     break
         else:
-            # random user's ids if there is no given role
-            winner = random.choice(users)
-            if decrease_rate is True:
-                while True:
+            while True:
+                # random user's ids if there is no given role
+                winner = random.choice(users)
+                if decrease_rate is True:
                     if winner.id in winners:
                         count += 1
                         if count >= rate:
                             break
                         else:
                             continue
+                break
+
         embed = discord.Embed(
             title=msg.embeds[0].title, description=f'{msg.embeds[0].description}\nNgười húp: {winner.mention}', colour=msg.embeds[0].colour)
         embed.set_author(
@@ -467,7 +513,7 @@ class Giveaway(commands.Cog):
         return cn
 
     # generate files for task-checking
-    def create_file(self, channel_id, msg_id, time, decrease_rate, no_won):
+    def create_file(self, channel_id, msg_id, time, decrease_rate, no_won, nitroed):
         files = []
         num = 0
         for file in os.listdir('./data/ga_end'):
@@ -475,14 +521,14 @@ class Giveaway(commands.Cog):
         if files == []:
             with open(f'./data/ga_end/0', 'a') as r:
                 r.write(str(channel_id)+'\n'+str(msg_id)+'\n'+time +
-                        '\n'+str(decrease_rate)+'\n'+str(no_won)+'\nnot')
+                        '\n'+str(decrease_rate)+'\n'+str(no_won)+'\n'+str(nitroed)+'\nnot')
             files.append('0')
         else:
             num = max(files)
             num = int(num) + 1
             with open(f'./data/ga_end/{num}', 'a') as f:
                 f.write(str(channel_id)+'\n'+str(msg_id)+'\n'+time +
-                        '\n'+str(decrease_rate)+'\n'+str(no_won)+'\nnot')
+                        '\n'+str(decrease_rate)+'\n'+str(no_won)+'\n'+str(nitroed)+'\nnot')
         return num
 
 
