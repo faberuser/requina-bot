@@ -1,6 +1,6 @@
 # SETUP
 # Config emoji (format: <:<emoji_name>:<emoji_id>>)
-import concurrent, asyncio, aiohttp, pickle, time, re, os, random, discord, config
+import concurrent, asyncio, aiohttp, pickle, time, re, os, random, discord, config, logging, traceback
 from discord.ext import tasks, commands
 from datetime import datetime
 emoji = '<:party:652813264614326313>'
@@ -29,7 +29,7 @@ class Giveaway(commands.Cog):
     async def before_check_ga_loop(self):
         await self.client.wait_until_ready()
 
-    def tasks_(self, file, msg, decrease_rate: bool, no_won: bool):
+    def tasks_(self, file, msg, decrease_rate: bool, no_won: bool, nitroed: bool):
         while True:
             try:
                 with open(f'./data/ga_end/{file}', 'r') as f:
@@ -44,7 +44,7 @@ class Giveaway(commands.Cog):
             current_time = datetime.now()
             if current_time >= end_time:
                 print(f"'{file}' Matched!")
-                return [file, msg, decrease_rate, no_won]
+                return [file, msg, decrease_rate, no_won, nitroed]
             else:
                 print(f"'{file}' Not match.")
                 time.sleep(60)
@@ -54,7 +54,7 @@ class Giveaway(commands.Cog):
         for file in os.listdir('./data/ga_end'):
             with open(f'./data/ga_end/{file}') as f:
                 lines = f.readlines()
-            if lines[5] == 'not':
+            if lines[6] == 'not':
                 try:
                     channel = self.client.get_channel(int(lines[0]))
                     msg = await channel.fetch_message(int(lines[1]))
@@ -62,11 +62,11 @@ class Giveaway(commands.Cog):
                     print("Failed to check_ga.")
                     print(e)
                 decrease_rate, no_won, nitroed = False, False, False
-                if lines[3] == 'True':
+                if 'True' in lines[3]:
                     decrease_rate = True
-                if lines[4] == 'True':
+                if 'True' in lines[4]:
                     no_won = True
-                if lines[5] == 'True':
+                if 'True' in lines[5]:
                     nitroed = True
                 ga_s.append([file, msg, decrease_rate, no_won, nitroed])
         if ga_s != []:
@@ -84,7 +84,11 @@ class Giveaway(commands.Cog):
                     else:
                         for future in futures:
                             if future._state == 'FINISHED':
-                                re = future.result()
+                                try:
+                                    re = future.result()
+                                except:
+                                    traceback.print_exc()
+                                    return
                                 print(f"'{re[0]}' FINISHED")
                                 try:
                                     users = await self.users(msg, re[3], re[4], re[0])
@@ -185,7 +189,7 @@ class Giveaway(commands.Cog):
             except ValueError:
                 await ctx.message.delete()
                 msg = await ctx.send(f'Error. Time data does not match format:\n`HH:mm-dd/MM/yyyy` or\n`full_hour:full_minute-full_day/full_month/full_year`\nPlease try again. This message will last for 10 seconds.')
-                time.sleep(10)
+                await asyncio.sleep(10)
                 await msg.delete()
                 return
 
@@ -291,7 +295,7 @@ class Giveaway(commands.Cog):
             embed = discord.Embed(
                 title='Roll Commad',
                 description='''Syntax:\n`r.roll <message_id> no_won=False nitroed=False decrease_rate=False <end_time>/leave_blank`\n
-				Time format same as `/ga`. This command must be used in the same channel with the Giveaway embed message.''',
+				Time format same as `r.ga`. This command must be used in the same channel with the Giveaway embed message.''',
                 colour=discord.Colour.from_rgb(
                     223, 165, 210),  # A gei embed color
             )
