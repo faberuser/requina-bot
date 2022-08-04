@@ -1,0 +1,9 @@
+discord.py
+requests
+cfscrape
+bs4
+fuzzywuzzy
+lxml
+pytz
+psutil
+tweepy

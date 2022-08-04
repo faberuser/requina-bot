@@ -1,0 +1,3 @@
+sudo rm ./docker-images/requina.tar ; sudo docker image build -t requina .
+sudo docker run -it requina
+sudo docker save -o ./docker-images/requina.tar requina
