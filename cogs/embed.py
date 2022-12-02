@@ -1,23 +1,24 @@
 import discord, asyncio, aiohttp, config
 from discord.ext import commands
+from discord import app_commands
 from cogs import sauce
-
 
 class Embed(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.hybrid_command(name="about", with_app_command=True, description="about myself")
+    @app_commands.guilds(*config.guilds)
     async def about(self, ctx):
         embed = discord.Embed(
             title="Requina",
             description="Merchant of Poison",
-            clour=discord.Color.red(),
+            color=discord.Color.red(),
             url="https://www.google.com",
         )
 
-        # embed.set_author(name=self.client.user.name, icon_url=self.client.user.avatar_url)
-        embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+        # embed.set_author(name=self.client.user.name, icon_url=self.client.user.display_avatar.url)
+        embed.set_footer(text=ctx.author.name, icon_url=ctx.author.display_avatar.url)
         # embed.set_image(url="https://cdn.discordapp.com/attachments/522649121933230100/525874173940203541/1545425605019.png")
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/620646132124483594/620651554738929665/nqy3eee7abm01.jpg"
@@ -31,18 +32,19 @@ class Embed(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.hybrid_command(name="avatar", with_app_command=True, description="show someone avatar")
+    @app_commands.guilds(*config.guilds)
     async def avatar(self, ctx, member: discord.Member = None):
         if member is not None:
             au = member
         if member is None:
             au = ctx.author
-        url_ = au.avatar_url
+        url_ = au.display_avatar.url
         embed = discord.Embed(title=f"{au}")
         embed.set_image(url=url_)
         embed.set_footer(
             text=f"Requested by: {ctx.author} | Hit the below emoji to find sauce of this image.",
-            icon_url=ctx.author.avatar_url,
+            icon_url=ctx.author.display_avatar.url,
         )
         msg = await ctx.send(embed=embed)
         emo = "🇸"
@@ -66,5 +68,5 @@ class Embed(commands.Cog):
             await msg.edit(embed=timeout_embed_)
 
 
-def setup(client):
-    client.add_cog(Embed(client))
+async def setup(client):
+    await client.add_cog(Embed(client))

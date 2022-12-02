@@ -31,8 +31,6 @@ else:
         bearer_token, consumer_key, consumer_secret, access_token, access_token_secret
     )
 
-client = discord.Client()
-
 lg = [
     [
         "EN",
@@ -80,7 +78,7 @@ class KingsRaidAnnounce(commands.Cog):
         await self.checker(lg)
 
     async def checker(self, lg):
-        resource.states_("new posts...")
+        # resource.states_("new posts...")
         for lg_ in lg:
             lang = lg_[0]
             url = lg_[1]
@@ -290,7 +288,7 @@ class KingsRaidAnnounce(commands.Cog):
 
     @tasks.loop(minutes=1, reconnect=True)  # twitter task checking
     async def twitter_(self):
-        resource.states_("Tweets")
+        # resource.states_("Tweets")
         try:
             tweets = self.api.get_users_tweets(
                 1248518690535923712, max_results=10, exclude="replies"
@@ -387,5 +385,5 @@ def write_channels(channel_path, channels):
         json_data.write(json.dumps(channels))
 
 
-def setup(client):
-    client.add_cog(KingsRaidAnnounce(client))
+async def setup(client):
+    await client.add_cog(KingsRaidAnnounce(client))

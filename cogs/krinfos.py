@@ -5,9 +5,6 @@ from discord.ext import commands
 
 from .utils import paginator, info_embed, embed_file
 
-client = discord.Client()
-
-
 class KingsRaidInfos(commands.Cog):
     def __init__(self, client):
         # game infos
@@ -1541,5 +1538,5 @@ class KingsRaidInfos(commands.Cog):
             pass
 
 
-def setup(client):
-    client.add_cog(KingsRaidInfos(client))
+async def setup(client):
+    await client.add_cog(KingsRaidInfos(client))

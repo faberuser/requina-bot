@@ -3,9 +3,6 @@ from datetime import datetime
 import datetime as dt
 from discord.ext import commands
 
-client = discord.Client()
-
-
 class Emoji(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -92,7 +89,7 @@ class Emoji(commands.Cog):
         if re == True:
             if guy:
                 await ctx.send(
-                    f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '-'])}{random.randrange(1,100,1)}%*"
+                    f"{guy} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '', '-'])}{random.randrange(1,100,1)}%*"
                 )
             else:
                 await ctx.send("Who ?")
@@ -132,7 +129,7 @@ class Emoji(commands.Cog):
         if re == True:
             if guy:
                 await ctx.send(
-                    f"<:WorryRip:697835039697666088> {guy}*'s luck has been transferd to* {ctx.author.mention} *by {random.randrange(1,101,1)}%*"
+                    f"<:WorryRip:697835039697666088> {guy}*'s luck has been transferd to* {ctx.author.mention} *by {random.choice(['', '', '-'])}{random.randrange(1,101,1)}%*"
                 )
             else:
                 await ctx.send("Who ?")
@@ -214,5 +211,5 @@ class Emoji(commands.Cog):
         return True
 
 
-def setup(client):
-    client.add_cog(Emoji(client))
+async def setup(client):
+    await client.add_cog(Emoji(client))

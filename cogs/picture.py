@@ -1,9 +1,7 @@
 import random
 import discord
 from discord.ext import commands
-
-client = discord.Client()
-
+from discord import app_commands
 
 class Picture(commands.Cog):
     def __init__(self, client):
@@ -150,5 +148,5 @@ class Picture(commands.Cog):
                 pass
 
 
-def setup(client):
-    client.add_cog(Picture(client))
+async def setup(client):
+    await client.add_cog(Picture(client))

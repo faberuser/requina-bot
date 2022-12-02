@@ -3,9 +3,6 @@ from discord.ext import commands
 import os
 import asyncio
 
-client = discord.Client()
-
-
 class Error(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -33,5 +30,5 @@ class Error(commands.Cog):
             raise error
 
 
-def setup(client):
-    client.add_cog(Error(client))
+async def setup(client):
+    await client.add_cog(Error(client))
