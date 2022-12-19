@@ -1,11 +1,33 @@
-import discord, random, json, asyncio
+import discord, random, json, asyncio, config
 from datetime import datetime
 import datetime as dt
 from discord.ext import commands
+from discord import app_commands
+
 
 class Emoji(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.ctx_menu_context_doino = app_commands.ContextMenu(
+            name="đòi nợ",
+            callback=self.context_doino,
+        )
+        self.ctx_menu_context_buff = app_commands.ContextMenu(
+            name="buff luck",
+            callback=self.context_buff,
+        )
+        self.ctx_menu_context_nerf = app_commands.ContextMenu(
+            name="nerf luck",
+            callback=self.context_nerf,
+        )
+        self.ctx_menu_context_steal = app_commands.ContextMenu(
+            name="steal luck",
+            callback=self.context_steal,
+        )
+        self.client.tree.add_command(self.ctx_menu_context_doino)
+        self.client.tree.add_command(self.ctx_menu_context_buff)
+        self.client.tree.add_command(self.ctx_menu_context_nerf)
+        self.client.tree.add_command(self.ctx_menu_context_steal)
 
     @commands.command()
     async def fk(self, ctx):
@@ -80,8 +102,25 @@ class Emoji(commands.Cog):
         else:
             return
 
-    @commands.command(aliases=["buff"])
-    async def buffluck(self, ctx, *, guy):
+    @app_commands.guilds(*config.guilds)
+    async def context_doino(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
+        if interaction.user.id == user.id:
+            await interaction.response.send_message(
+                "bạn đã nợ bản thân quá nhiều <:WorryNoThanks:595603366936313871>"
+            )
+        elif self.client.user.id == user.id:
+            await interaction.response.send_message(
+                "tôi không nợ bạn <:WorryNoThanks:595603366936313871>"
+            )
+        else:
+            await interaction.response.send_message(
+                f"{user.mention} trả tiền cho {interaction.user.mention} <:tratiende:1003582637597798400>"
+            )
+
+    @commands.command(aliases=["buffluck"])
+    async def buff(self, ctx, *, guy):
         if "@everyone" in guy or "@here" in guy:
             await ctx.send("Don't try to trick me, fool")
             return
@@ -99,10 +138,20 @@ class Emoji(commands.Cog):
             await asyncio.sleep(10)
             await msg.delete()
 
-    @commands.command(
-        aliases=["debuff", "tach", "neft", "neftluck", "nerf", "nerfluck"]
-    )
-    async def debuffluck(self, ctx, *, guy):
+    @app_commands.guilds(*config.guilds)
+    async def context_buff(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
+        re = self.limit_check("./data/buff_limit.json", interaction.user.id, "buff")
+        if re == True:
+            await interaction.response.send_message(
+                f"{user.mention} <:WorryBuffLuck:697834453275377705> *Luck is increased by {random.choice(['', '', '-'])}{random.randrange(1,100,1)}%*"
+            )
+        else:
+            await interaction.response.send_message(re, ephemeral=True)
+
+    @commands.command(aliases=["debuff", "tach", "neft", "neftluck", "nerfluck"])
+    async def nerf(self, ctx, *, guy):
         if "@everyone" in guy or "@here" in guy:
             await ctx.send("Don't try to trick me, fool")
             return
@@ -119,6 +168,18 @@ class Emoji(commands.Cog):
             await ctx.message.delete()
             await asyncio.sleep(10)
             await msg.delete()
+
+    @app_commands.guilds(*config.guilds)
+    async def context_nerf(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
+        re = self.limit_check("./data/nerf_limit.json", interaction.user.id, "nerf")
+        if re == True:
+            await interaction.response.send_message(
+                f"<:WorryTachTachTach:697835039987073114> {user.mention} *Luck is decreased by {random.randrange(1,101,1)}%*"
+            )
+        else:
+            await interaction.response.send_message(re, ephemeral=True)
 
     @commands.command(aliases=["stealluck", "stealuck", "cuop", "cuopluck"])
     async def steal(self, ctx, *, guy):
@@ -138,6 +199,18 @@ class Emoji(commands.Cog):
             await ctx.message.delete()
             await asyncio.sleep(10)
             await msg.delete()
+
+    @app_commands.guilds(*config.guilds)
+    async def context_steal(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
+        re = self.limit_check("./data/steal_limit.json", interaction.user.id, "steal")
+        if re == True:
+            await interaction.response.send_message(
+                f"<:WorryRip:697835039697666088> {user.mention}*'s luck has been transferd to* {interaction.user.mention} *by {random.choice(['', '', '-'])}{random.randrange(1,101,1)}%*"
+            )
+        else:
+            await interaction.response.send_message(re, ephemeral=True)
 
     def limit_check(self, file, id, act):
         with open(file) as r:
