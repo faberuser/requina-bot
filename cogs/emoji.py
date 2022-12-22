@@ -83,42 +83,6 @@ class Emoji(commands.Cog):
         await ctx.send("**{0.display_name}**".format(ctx.author))
         await ctx.send("<:stare:624993223420542976> ")
 
-    @commands.command(aliases=["tratien", "tratiende"])
-    async def doino(self, ctx, *, guy=None):
-        if guy is not None:
-            if "@everyone" in guy or "@here" in guy:
-                await ctx.send("không ai nợ bạn cả <:WorryNoThanks:595603366936313871>")
-            elif str(ctx.author.id) in guy:
-                await ctx.send(
-                    "bạn đã nợ bản thân quá nhiều <:WorryNoThanks:595603366936313871>"
-                )
-            elif str(self.client.user.id) in guy:
-                await ctx.send("tôi không nợ bạn <:WorryNoThanks:595603366936313871>")
-            else:
-                await ctx.send(
-                    f"{guy} trả tiền cho {ctx.author.mention} <:tratiende:1003582637597798400>"
-                )
-                await ctx.message.delete()
-        else:
-            return
-
-    @app_commands.guilds(*config.guilds)
-    async def context_doino(
-        self, interaction: discord.Interaction, user: discord.Member
-    ):
-        if interaction.user.id == user.id:
-            await interaction.response.send_message(
-                "bạn đã nợ bản thân quá nhiều <:WorryNoThanks:595603366936313871>"
-            )
-        elif self.client.user.id == user.id:
-            await interaction.response.send_message(
-                "tôi không nợ bạn <:WorryNoThanks:595603366936313871>"
-            )
-        else:
-            await interaction.response.send_message(
-                f"{user.mention} trả tiền cho {interaction.user.mention} <:tratiende:1003582637597798400>"
-            )
-
     @commands.command(aliases=["buffluck"])
     async def buff(self, ctx, *, guy):
         if "@everyone" in guy or "@here" in guy:
@@ -211,6 +175,55 @@ class Emoji(commands.Cog):
             )
         else:
             await interaction.response.send_message(re, ephemeral=True)
+
+    @commands.command(aliases=["tratien", "tratiende"])
+    async def doino(self, ctx, *, guy=None):
+        if guy is not None:
+            if "@everyone" in guy or "@here" in guy:
+                await ctx.send("không ai nợ bạn cả <:WorryNoThanks:595603366936313871>")
+            elif str(ctx.author.id) in guy:
+                await ctx.send(
+                    "bạn đã nợ bản thân quá nhiều <:WorryNoThanks:595603366936313871>"
+                )
+            elif str(self.client.user.id) in guy:
+                await ctx.send("tôi không nợ bạn <:WorryNoThanks:595603366936313871>")
+            else:
+                re = self.limit_check("./data/doino_limit.json", ctx.author.id, "doino")
+                if re == True:
+                    await ctx.send(
+                        f"{guy} trả tiền cho {ctx.author.mention} <:tratiende:1003582637597798400>"
+                    )
+                    await ctx.message.delete()
+                else:
+                    msg = await ctx.send(re)
+                    await ctx.message.delete()
+                    await asyncio.sleep(10)
+                    await msg.delete()
+        else:
+            return
+
+    @app_commands.guilds(*config.guilds)
+    async def context_doino(
+        self, interaction: discord.Interaction, user: discord.Member
+    ):
+        if interaction.user.id == user.id:
+            await interaction.response.send_message(
+                "bạn đã nợ bản thân quá nhiều <:WorryNoThanks:595603366936313871>"
+            )
+        elif self.client.user.id == user.id:
+            await interaction.response.send_message(
+                "tôi không nợ bạn <:WorryNoThanks:595603366936313871>"
+            )
+        else:
+            re = self.limit_check(
+                "./data/doino_limit.json", interaction.user.id, "doino"
+            )
+            if re == True:
+                await interaction.response.send_message(
+                    f"{user.mention} trả tiền cho {interaction.user.mention} <:tratiende:1003582637597798400>"
+                )
+            else:
+                await interaction.response.send_message(re, ephemeral=True)
 
     def limit_check(self, file, id, act):
         with open(file) as r:
