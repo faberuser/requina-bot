@@ -73,22 +73,28 @@ class BingAI(commands.Cog):
         if capped:
             embed = discord.Embed(
                 description="*The max number of messages in the previous conversation has been reached, the response below is in the new conversation:*\n\n"
-                + msg_text
-                + "\nThrottling: "
-                + str(response["item"]["throttling"][maxNumUserMessagesInConversation])
-                + "/"
-                + str(response["item"]["throttling"][numUserMessagesInConversation])
-                + " | Send 'bing reset' to reset the conversation",
+                + msg_text,
                 color=config.embed_color,
             )
         else:
-            embed = discord.Embed(description=msg_text, color=config.embed_color)
+            embed = discord.Embed(
+                description=msg_text,
+                color=config.embed_color,
+            )
         embed.set_author(name=prompt)
         embed.set_footer(text="Select suggested responses:")
         if learn_more != "":
             embed.add_field(name="Learn more:", value=learn_more)
         if suggested_response != "":
             embed.add_field(name="Suggested responses:", value=suggested_response)
+        embed.add_field(
+            name="Throttling:",
+            value="`"
+            + str(response["item"]["throttling"]["numUserMessagesInConversation"])
+            + "/"
+            + str(response["item"]["throttling"]["maxNumUserMessagesInConversation"])
+            + "`\nSend `bing reset` to reset the conversation",
+        )
         return embed, suggested_response_list
 
     def filter_msg_text(self, response):
