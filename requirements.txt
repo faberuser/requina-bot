@@ -7,3 +7,4 @@ lxml
 pytz
 psutil
 tweepy
+EdgeGPT

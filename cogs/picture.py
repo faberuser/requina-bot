@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+
 class Picture(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -92,7 +93,7 @@ class Picture(commands.Cog):
 
     @commands.command()
     async def randomart(self, ctx):
-        embed = discord.Embed(title="Random", clour=discord.Color.red())
+        embed = discord.Embed(title="Random", color=config.embed_color)
 
         raart = [
             "https://cdn.discordapp.com/attachments/522649121933230100/533635120565846026/image0.jpg",

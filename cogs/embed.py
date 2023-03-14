@@ -3,17 +3,20 @@ from discord.ext import commands
 from discord import app_commands
 from cogs import sauce
 
+
 class Embed(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_command(name="about", with_app_command=True, description="about myself")
+    @commands.hybrid_command(
+        name="about", with_app_command=True, description="about myself"
+    )
     @app_commands.guilds(*config.guilds)
     async def about(self, ctx):
         embed = discord.Embed(
             title="Requina",
             description="Merchant of Poison",
-            color=discord.Color.red(),
+            color=config.embed_color,
             url="https://www.google.com",
         )
 
@@ -32,7 +35,9 @@ class Embed(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command(name="avatar", with_app_command=True, description="show someone avatar")
+    @commands.hybrid_command(
+        name="avatar", with_app_command=True, description="show someone avatar"
+    )
     @app_commands.guilds(*config.guilds)
     async def avatar(self, ctx, member: discord.Member = None):
         if member is not None:

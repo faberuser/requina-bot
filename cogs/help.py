@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
 
+
 class Help(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     # @commands.command()
     async def help(self, ctx):
-        embed = discord.Embed(title="Requina", clour=discord.Color.red())
+        embed = discord.Embed(title="Requina", color=config.embed_color)
 
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/620646132124483594/620651554738929665/nqy3eee7abm01.jpg"
@@ -51,7 +52,7 @@ class Help(commands.Cog):
 
     @commands.command()
     async def emolist(self, ctx):
-        embed = discord.Embed(title="Requina", clour=discord.Color.red())
+        embed = discord.Embed(title="Requina", color=config.embed_color)
 
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/620646132124483594/620651554738929665/nqy3eee7abm01.jpg"
