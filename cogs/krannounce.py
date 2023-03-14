@@ -7,29 +7,31 @@ from .utils import resource, info_embed
 check = None
 auth = None
 api = None
-if (
-    config.BEARER_TOKEN == ""
-    or config.CONSUMER_KEY == ""
-    or config.CONSUMER_SECRET == ""
-    or config.ACCESS_TOKEN == ""
-    or config.ACCESS_TOKEN_SECRET == ""
-):
-    check = False
-    print("Twitter API Token(s) has been passed. Tweet-checking has been disabled.")
-else:
-    check = True
-    bearer_token = config.BEARER_TOKEN
-    consumer_key = config.CONSUMER_KEY
-    consumer_secret = config.CONSUMER_SECRET
-    access_token = config.ACCESS_TOKEN
-    access_token_secret = config.ACCESS_TOKEN_SECRET
+# if (
+#     config.BEARER_TOKEN == ""
+#     or config.CONSUMER_KEY == ""
+#     or config.CONSUMER_SECRET == ""
+#     or config.ACCESS_TOKEN == ""
+#     or config.ACCESS_TOKEN_SECRET == ""
+# ):
+#     check = False
+#     print("Twitter API Token(s) has been passed. Tweet-checking has been disabled.")
+# else:
+#     check = True
+#     bearer_token = config.BEARER_TOKEN
+#     consumer_key = config.CONSUMER_KEY
+#     consumer_secret = config.CONSUMER_SECRET
+#     access_token = config.ACCESS_TOKEN
+#     access_token_secret = config.ACCESS_TOKEN_SECRET
 
-    # auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    # auth.set_access_token(access_token, access_token_secret)
-    # api = tweepy.API(auth)
-    api = tweepy.Client(
-        bearer_token, consumer_key, consumer_secret, access_token, access_token_secret
-    )
+#     # auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+#     # auth.set_access_token(access_token, access_token_secret)
+#     # api = tweepy.API(auth)
+#     api = tweepy.Client(
+#         bearer_token, consumer_key, consumer_secret, access_token, access_token_secret
+#     )
+# twitter API changed, requires special authorization
+check = False
 
 lg = [
     [
