@@ -49,6 +49,9 @@ class BingAI(commands.Cog):
         while True:
             try:
                 response = await self.bot.ask(prompt=prompt)
+                if response["item"]["firstNewMessageIndex"] == None:
+                    await self.bot.reset()
+                    continue
                 break
             except:
                 continue
@@ -61,14 +64,16 @@ class BingAI(commands.Cog):
 
         try:
             msg_text = self.filter_msg_text(response)
-        except KeyError:
-            print(
-                response["item"]["messages"][1]["adaptiveCards"][0]["body"][0]["text"]
+            learn_more, suggested_response, suggested_response_list = self.get_lm_sr(
+                response, msg_text
             )
-            pass
-        learn_more, suggested_response, suggested_response_list = self.get_lm_sr(
-            response, msg_text
-        )
+        except KeyError:
+            msg_text = response["item"]["messages"][1]["adaptiveCards"][0]["body"][0][
+                "text"
+            ]
+            learn_more = ""
+            suggested_response = ""
+            suggested_response_list = []
 
         if capped:
             embed = discord.Embed(
