@@ -24,7 +24,10 @@ class SaucyBot_Handler(commands.Cog):
                     )
                     await message.delete()
                 except asyncio.TimeoutError:
-                    await message.clear_reactions()
+                    try:
+                        await message.clear_reactions()
+                    except:
+                        pass
 
 
 async def setup(client):
