@@ -28,6 +28,8 @@ class SaucyBot_Handler(commands.Cog):
                         await message.clear_reactions()
                     except:
                         pass
+                except discord.errors.NotFound:
+                    pass
 
 
 async def setup(client):
