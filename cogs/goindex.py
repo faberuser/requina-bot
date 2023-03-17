@@ -64,7 +64,7 @@ class GoIndex(commands.Cog):
                         + "]("
                         + re[1]
                         .replace(
-                            "Y:/My Drive/Stable Diffusion/goindex sd/embeddings/",
+                            "Y:/Other computers/My Computer (1)/embeds/embeddings",
                             "https://sd.k-cf.workers.dev/1:/",
                         )
                         .replace(" ", "%20")
@@ -77,7 +77,7 @@ class GoIndex(commands.Cog):
                         + "]("
                         + re[1]
                         .replace(
-                            "Y:/My Drive/Stable Diffusion/goindex sd/hypernetworks/",
+                            "Y:/Other computers/My Computer (1)/embeds/hypernetworks/",
                             "https://sd.k-cf.workers.dev/2:/",
                         )
                         .replace(" ", "%20")
@@ -90,7 +90,7 @@ class GoIndex(commands.Cog):
                         + "]("
                         + re[1]
                         .replace(
-                            "Y:/My Drive/Stable Diffusion/goindex sd/lora/",
+                            "Y:/Other computers/My Computer (1)/embeds/lora/",
                             "https://sd.k-cf.workers.dev/3:/",
                         )
                         .replace(" ", "%20")
