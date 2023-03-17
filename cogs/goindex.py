@@ -110,7 +110,7 @@ class GoIndex(commands.Cog):
                         + ")\n"
                     )
             embed = discord.Embed(
-                title="Search query for: " + filename,
+                title="Search query for: " + query,
                 description=des,
                 color=config.embed_color,
             )
