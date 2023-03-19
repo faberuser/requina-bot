@@ -18,6 +18,19 @@ class GoIndex(commands.Cog):
             await ctx.reply(embed=embed)
             return
         async with ctx.channel.typing():
+            if query.lower() == "vae":
+                embed = discord.Embed(
+                    title="All SD vaes indexed",
+                    description="trinart: [autoencoder_fix_kl-f8-trinart_characters.ckpt](https://sd.k-cf.workers.dev/5:/autoencoder_fix_kl-f8-trinart_characters.ckpt)\n"
+                    + "wd 1.4: [kl-f8-anime.ckpt](https://sd.k-cf.workers.dev/5:/kl-f8-anime.ckpt)\n"
+                    + "wd 1.4: [kl-f8-anime2.ckpt](https://sd.k-cf.workers.dev/5:/kl-f8-anime2.ckpt)\n"
+                    + "novelai: [novelai.ckpt](https://sd.k-cf.workers.dev/5:/novelai.ckpt)\n"
+                    + "sd 1.5: [vae-ft-ema-560000-ema-pruned.ckpt](https://sd.k-cf.workers.dev/5:/vae-ft-ema-560000-ema-pruned.ckpt)\n"
+                    + "sd 1.5: [vae-ft-mse-840000-ema-pruned.ckpt](https://sd.k-cf.workers.dev/5:/vae-ft-mse-840000-ema-pruned.ckpt)",
+                    color=config.embed_color,
+                )
+                await ctx.reply(embed=embed)
+                return
             files = {
                 "embeddings": {},
                 "hypernetworks": {},
@@ -36,13 +49,16 @@ class GoIndex(commands.Cog):
             files["checkpoints"] = self.get_files(
                 "Y:/My Drive/Stable Diffusion/goindex sd/checkpoints"
             )
+            # files["vae"] = self.get_files(
+            #     "Y:/Other computers/My Computer (1)/embeds/vae"
+            # )
 
             all_files = []
             for _type in files:
                 for file in files[_type]:
                     all_files.append(file)
 
-            res = process.extract(query, all_files)
+            res = process.extract(query, all_files, limit=10)
             parsed_res = []
             for re in res:
                 if re[1] >= 80:
@@ -70,7 +86,7 @@ class GoIndex(commands.Cog):
                         .replace(" ", "%20")
                         + ")\n"
                     )
-                if "hypernetworks" in re[1]:
+                elif "hypernetworks" in re[1]:
                     des += (
                         "hypernetworks: ["
                         + re[0]
@@ -83,7 +99,7 @@ class GoIndex(commands.Cog):
                         .replace(" ", "%20")
                         + ")\n"
                     )
-                if "lora" in re[1]:
+                elif "lora" in re[1]:
                     des += (
                         "lora: ["
                         + re[0]
@@ -96,7 +112,7 @@ class GoIndex(commands.Cog):
                         .replace(" ", "%20")
                         + ")\n"
                     )
-                if "checkpoints" in re[1]:
+                elif "checkpoints" in re[1]:
                     des += (
                         "checkpoints: ["
                         + re[0]
@@ -109,6 +125,19 @@ class GoIndex(commands.Cog):
                         .replace(" ", "%20")
                         + ")\n"
                     )
+                # elif "vae" in re[1]:
+                #     des += (
+                #         "vae: ["
+                #         + re[0]
+                #         + "]("
+                #         + re[1]
+                #         .replace(
+                #             "Y:/Other computers/My Computer (1)/embeds/vae/",
+                #             "https://sd.k-cf.workers.dev/5:/",
+                #         )
+                #         .replace(" ", "%20")
+                #         + ")\n"
+                #     )
             embed = discord.Embed(
                 title="Search query for: " + query,
                 description=des,
