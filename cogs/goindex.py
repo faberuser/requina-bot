@@ -23,10 +23,10 @@ class GoIndex(commands.Cog):
                     title="All SD vaes indexed",
                     description="trinart: [autoencoder_fix_kl-f8-trinart_characters.ckpt](https://sd.k-cf.workers.dev/5:/autoencoder_fix_kl-f8-trinart_characters.ckpt)\n"
                     + "wd 1.4: [kl-f8-anime.ckpt](https://sd.k-cf.workers.dev/5:/kl-f8-anime.ckpt)\n"
-                    + "wd 1.4: [kl-f8-anime2.ckpt](https://sd.k-cf.workers.dev/5:/kl-f8-anime2.ckpt)\n"
+                    + "wd 1.4 v2: [kl-f8-anime2.ckpt](https://sd.k-cf.workers.dev/5:/kl-f8-anime2.ckpt)\n"
                     + "novelai: [novelai.ckpt](https://sd.k-cf.workers.dev/5:/novelai.ckpt)\n"
                     + "sd 1.5: [vae-ft-ema-560000-ema-pruned.ckpt](https://sd.k-cf.workers.dev/5:/vae-ft-ema-560000-ema-pruned.ckpt)\n"
-                    + "sd 1.5: [vae-ft-mse-840000-ema-pruned.ckpt](https://sd.k-cf.workers.dev/5:/vae-ft-mse-840000-ema-pruned.ckpt)",
+                    + "sd 1.5 v2: [vae-ft-mse-840000-ema-pruned.ckpt](https://sd.k-cf.workers.dev/5:/vae-ft-mse-840000-ema-pruned.ckpt)",
                     color=config.embed_color,
                 )
                 await ctx.reply(embed=embed)
