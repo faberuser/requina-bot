@@ -65,7 +65,7 @@ class Embed(commands.Cog):
             if str(reaction.emoji) in emo:
                 await msg.clear_reactions()
                 await msg.edit(embed=sauce.Sauce(self.client).searching_embed(embed))
-                sauce_embed_ = sauce.Sauce(self.client).sauce_embed(embed)
+                sauce_embed_ = await sauce.Sauce(self.client).sauce_embed(embed)
                 await msg.edit(embed=sauce_embed_)
         except asyncio.TimeoutError:
             await msg.clear_reactions()
