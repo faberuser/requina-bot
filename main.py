@@ -37,7 +37,8 @@ class Client(commands.Bot):
 
 client = Client()
 client.remove_command("help")
-# help command
+
+
 class MinimalHelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
         destination = self.get_destination()

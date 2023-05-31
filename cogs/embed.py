@@ -1,4 +1,7 @@
-import discord, asyncio, aiohttp, config
+import discord
+import asyncio
+import aiohttp
+import config
 from discord.ext import commands
 from discord import app_commands
 from cogs import sauce
@@ -21,7 +24,8 @@ class Embed(commands.Cog):
         )
 
         # embed.set_author(name=self.client.user.name, icon_url=self.client.user.display_avatar.url)
-        embed.set_footer(text=ctx.author.name, icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=ctx.author.name,
+                         icon_url=ctx.author.display_avatar.url)
         # embed.set_image(url="https://cdn.discordapp.com/attachments/522649121933230100/525874173940203541/1545425605019.png")
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/620646132124483594/620651554738929665/nqy3eee7abm01.jpg"

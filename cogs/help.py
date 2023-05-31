@@ -18,7 +18,8 @@ class Help(commands.Cog):
             name="r.help", value="See some commands in general", inline=False
         )
         embed.add_field(name="r.ping", value="Just a funny poke", inline=False)
-        embed.add_field(name="r.avatar", value="Show your avatar", inline=False)
+        embed.add_field(name="r.avatar",
+                        value="Show your avatar", inline=False)
         embed.add_field(
             name="r.[emoji]",
             value="Show emoji. You can see the list by using r.emolist",
@@ -59,8 +60,10 @@ class Help(commands.Cog):
         )
 
         # embed.add_field(name="", value="", inline=False)
-        embed.add_field(name="Emoji-Pepe", value="doubt, rope, whrope", inline=False)
-        embed.add_field(name="Emoji-Requina", value="heh, hehe, wow", inline=False)
+        embed.add_field(name="Emoji-Pepe",
+                        value="doubt, rope, whrope", inline=False)
+        embed.add_field(name="Emoji-Requina",
+                        value="heh, hehe, wow", inline=False)
         embed.add_field(name="Emoji-KR", value="letsgo", inline=False)
         embed.add_field(
             name="Worry",
