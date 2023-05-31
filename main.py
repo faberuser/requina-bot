@@ -1,7 +1,12 @@
-import discord, os, config, logging
+import os
+import logging
+from dotenv import load_dotenv
+import config
+import discord
 from discord.ext import commands
 from discord import app_commands
 
+load_dotenv()
 logging.basicConfig(
     handlers=[logging.FileHandler("./data/log.log", "a", "utf-8")],
     level=logging.INFO,
