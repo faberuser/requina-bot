@@ -3,9 +3,8 @@ from discord import Colour
 prefix = ["r.", "R."]
 owners = [417983447488004097, 470081764271063060, 213186434193031168]
 guilds = [
-    652813007981772801,  # Epis
-    953955996735266926,  # stuffs
     213557352782233601,  # Sonako
+    652813007981772801,  # Epis
 ]
 audio_channel = 874997678759632917
 embed_color = Colour.dark_gold()
