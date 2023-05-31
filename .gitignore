@@ -3,3 +3,4 @@ data/log.log
 cookies.json
 venv
 .vscode
+.env
