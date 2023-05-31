@@ -52,4 +52,4 @@ async def on_ready():
     print("Logged in as {0} ({0.id})\nWelcome my Lord.".format(client.user))
 
 
-client.run(config.token, reconnect=True)
+client.run(os.getenv('DISCORD_TOKEN'), reconnect=True)
