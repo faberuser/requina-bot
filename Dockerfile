@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
 
 # start by pulling the python image
-FROM python:3.8-slim
+FROM python:3.10-slim
 
-RUN apt-get update && \
-    apt-get install -yq tzdata && \
+RUN apt-get install -yq tzdata && \
     ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean autoclean && apt-get autoremove --yes
 
 ENV TZ="Asia/Ho_Chi_Minh"
 
@@ -17,7 +17,7 @@ COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
 
 # install the dependencies and packages in the requirements file
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # copy every content from the local file to the image
 COPY . /app

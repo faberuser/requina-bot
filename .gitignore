@@ -3,3 +3,4 @@ config_test.py
 data/log.log
 docker-images/
 cookies.json
+venv

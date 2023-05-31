@@ -8,3 +8,4 @@ pytz
 psutil
 tweepy
 EdgeGPT
+urllib3==1.26.16
