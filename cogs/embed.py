@@ -1,6 +1,5 @@
 import discord
 import asyncio
-import aiohttp
 import config
 from discord.ext import commands
 from discord import app_commands
