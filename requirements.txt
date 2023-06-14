@@ -7,6 +7,6 @@ lxml
 pytz
 psutil
 tweepy
-EdgeGPT
 urllib3==1.26.16
 python-dotenv
+revChatGPT
