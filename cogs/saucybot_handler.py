@@ -12,7 +12,7 @@ class SaucyBot_Handler(commands.Cog):
     async def on_message(self, message):
         if message.author.id == 647368715742216193:  # SaucyBot
             if message.reference:
-                await message.add_reaction("🗑️")
+                await message.add_reaction("❌")
                 rf = await message.channel.fetch_message(message.reference.message_id)
 
                 def check(reaction, user):
