@@ -4,7 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: requina-bot
     restart: unless-stopped
     environment:
       - DISCORD_TOKEN=$DISCORD_TOKEN
