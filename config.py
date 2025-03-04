@@ -29,5 +29,3 @@ kre_categories = [
     1002274511950971000,  # PVP
 ]
 kre_invite = "https://discord.gg/cBeMt8jAST"
-
-chatgpt_conversation = "0dd288ba-2bb0-46d0-8797-8219c3423875"

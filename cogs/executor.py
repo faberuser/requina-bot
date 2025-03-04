@@ -8,7 +8,7 @@ class Executor(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def ban(self, ctx, member: discord.Member):       
+    async def ban(self, ctx, member: discord.Member = None):       
         if member is None:
             await ctx.send("Please provide a member to ban and purge their latest messages")
             return
@@ -26,7 +26,7 @@ class Executor(commands.Cog):
         await ctx.send(f"{member} has been banned and their latest messages have been purged")
 
     @commands.command()
-    async def purge(self, ctx, member: discord.Member):
+    async def purge(self, ctx, member: discord.Member = None):
         if member is None:
             await ctx.send("Please provide a member to purge their latest messages")
             return
