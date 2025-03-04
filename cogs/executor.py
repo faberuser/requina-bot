@@ -7,9 +7,12 @@ class Executor(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-
     @commands.command()
-    async def ban(self, ctx, member: discord.Member):        
+    async def ban(self, ctx, member: discord.Member):       
+        if member is None:
+            await ctx.send("Please provide a member to ban and purge their latest messages")
+            return
+         
         # check if the user is the guild owner
         if ctx.author != ctx.guild.owner:
             await ctx.send("You do not have permission to ban")
@@ -20,11 +23,14 @@ class Executor(commands.Cog):
         
         # ban the member
         await member.ban()
-        await ctx.send(f"{member} has been banned and their messages have been purged")
-
+        await ctx.send(f"{member} has been banned and their latest messages have been purged")
 
     @commands.command()
     async def purge(self, ctx, member: discord.Member):
+        if member is None:
+            await ctx.send("Please provide a member to purge their latest messages")
+            return
+        
         # check if the user is the guild owner
         if ctx.author != ctx.guild.owner:
             await ctx.send("You do not have permission to purge")
@@ -32,7 +38,6 @@ class Executor(commands.Cog):
         
         # purge message
         await self.purge_message(ctx, member)
-    
     
     async def purge_message(self, ctx, member: discord.Member):
         # loop through the channels in the guild
@@ -45,7 +50,6 @@ class Executor(commands.Cog):
                     await message.delete()
                     continue
         await ctx.send(f"Messages from {member} have been purged")
-
 
 async def setup(client):
     await client.add_cog(Executor(client))
