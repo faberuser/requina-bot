@@ -8,8 +8,7 @@ class Executor(commands.Cog):
         self.client = client
 
 
-    @commands.hybrid_command(name="ban", with_app_command=True, description="Ban a member")
-    @app_commands.guilds(*config.guilds)
+    @commands.command()
     async def ban(self, ctx, member: discord.Member):        
         # check if the user is the guild owner
         if ctx.author != ctx.guild.owner:
@@ -24,8 +23,7 @@ class Executor(commands.Cog):
         await ctx.send(f"{member} has been banned and their messages have been purged")
 
 
-    @commands.hybrid_command(name="purge", with_app_command=True, description="Purge first message of a member across channels")
-    @app_commands.guilds(*config.guilds)
+    @commands.command()
     async def purge(self, ctx, member: discord.Member):
         # check if the user is the guild owner
         if ctx.author != ctx.guild.owner:
