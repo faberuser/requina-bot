@@ -22,8 +22,11 @@ class Executor(commands.Cog):
         await self.purge_message(ctx, member)
         
         # ban the member
-        await member.ban()
-        await ctx.send(f"{member} has been banned and their latest messages have been purged")
+        try:
+            await member.ban()
+            await ctx.send(f"`{member}` has been banned")
+        except discord.Forbidden:
+            await ctx.send("I do not have permission to ban this member")
 
     @commands.command()
     async def purge(self, ctx, member: discord.Member = None):
@@ -42,14 +45,24 @@ class Executor(commands.Cog):
     async def purge_message(self, ctx, member: discord.Member):
         # loop through the channels in the guild
         for channel in ctx.guild.channels:
-            # loop through first 100 msgs in the channel
-            async for message in channel.history(limit=100):
+            # see if the channel is a text channel
+            if not isinstance(channel, discord.TextChannel):
+                continue
+            # see if the bot has permission to read messages
+            if not channel.permissions_for(ctx.guild.me).read_message_history:
+                continue
+            # see if the bot has permission to delete messages
+            if not channel.permissions_for(ctx.guild.me).manage_messages:
+                continue
+            
+            # loop through first 50 msgs in the channel
+            async for message in channel.history(limit=50):
                 # if the message author is the member to ban
                 if message.author == member:
                     # delete the message
                     await message.delete()
-                    continue
-        await ctx.send(f"Messages from {member} have been purged")
+                    break
+        await ctx.send(f"Latest messages from `{member}` have been purged")
 
 async def setup(client):
     await client.add_cog(Executor(client))
