@@ -1,4 +1,4 @@
-import discord, time, os, re, requests, cfscrape, asyncio, config
+import discord, time, re, requests, cfscrape, asyncio, config
 from itertools import cycle
 from lxml.html import fromstring
 from discord.ext import commands

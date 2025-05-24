@@ -9,3 +9,4 @@ psutil
 tweepy
 urllib3==1.26.16
 python-dotenv
+google-genai
