@@ -26,10 +26,8 @@ class GenAI(commands.Cog):
             response = client.models.generate_content(
                 model="gemini-2.0-flash", contents="Summarize this conversation" + "\n\n" + text
             )
-            
             embed = discord.Embed(title=f"Conversation Summary for {str(history_length)} Last Messages", description=response.text, color=config.embed_color)
-            
-            await ctx.send(response.text)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
         
