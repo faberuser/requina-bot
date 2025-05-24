@@ -24,7 +24,7 @@ class GenAI(commands.Cog):
                 await ctx.send("No messages to summarize.")
                 return
             response = client.models.generate_content(
-                model="gemini-2.0-flash", contents="Summarize this conversation" + "\n\n" + text
+                model="gemini-2.0-flash", contents="Tóm tắt cuộc trò chuyện này:" + "\n\n" + text
             )
             embed = discord.Embed(title=f"Conversation Summary for {str(history_length)} Last Messages", description=response.text, color=config.embed_color)
             await ctx.send(embed=embed)
