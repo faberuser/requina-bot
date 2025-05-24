@@ -6,10 +6,6 @@ from discord.ext import commands
 load_dotenv()
 client = genai.Client(api_key=os.getenv('GENAI_KEY'))
 
-response = client.models.generate_content(
-    model="gemini-2.0-flash", contents="Explain how AI works in a few words"
-)
-
 class GenAI(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -30,8 +26,6 @@ class GenAI(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
-        
-
 
 async def setup(client):
     await client.add_cog(GenAI(client))
