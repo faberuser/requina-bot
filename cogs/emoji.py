@@ -1,4 +1,8 @@
-import discord, random, json, asyncio, config
+import discord
+import random
+import json
+import asyncio
+import config
 from datetime import datetime
 import datetime as dt
 from discord.ext import commands

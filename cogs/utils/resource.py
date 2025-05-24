@@ -1,4 +1,5 @@
-import psutil, os
+import psutil
+import os
 from datetime import datetime
 
 # check system's resource

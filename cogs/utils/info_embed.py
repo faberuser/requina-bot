@@ -1,4 +1,5 @@
-import discord, config
+import discord
+import config
 
 class Info_Embed:
 

@@ -1,4 +1,8 @@
-import discord, json, asyncio, os, config
+import config
+import os
+import json
+import asyncio
+import discord
 import re as research
 from fuzzywuzzy import process
 from discord.ext import commands
