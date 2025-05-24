@@ -17,6 +17,7 @@ class GenAI(commands.Cog):
         bot_msg = await ctx.reply("Summarizing the conversation...")
         try:
             messages = [message async for message in ctx.channel.history(limit=history_length)]
+            messages.reverse()
             text = "\n".join([msg.author.display_name + ": " + msg.content for msg in messages if not msg.author.bot and not msg.content.lower().startswith("r.")])
             if not text:
                 await bot_msg.edit(content="No messages to summarize.")
