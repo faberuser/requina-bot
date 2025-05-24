@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # start by pulling the python image
-FROM python:3.10-slim
+FROM python:alpine
 
 RUN apt-get install -yq tzdata && \
     ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
