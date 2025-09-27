@@ -6,8 +6,8 @@ from typing import Any
 from py_expression_eval import Parser
 from beautifultable import BeautifulTable
 
-from utils import info_embed
-from config import config
+from .utils import info_embed
+import config
 
 client = discord.Client()
 
