@@ -5,12 +5,8 @@ from discord.ext import commands
 from typing import Any
 from py_expression_eval import Parser
 from beautifultable import BeautifulTable
-
 from .utils import info_embed
 import config
-
-client = discord.Client()
-
 
 class Math(commands.Cog):
     def __init__(self, client):
@@ -214,5 +210,5 @@ class Math(commands.Cog):
             )
 
 
-def setup(client):
-    client.add_cog(Math(client))
+async def setup(client):
+    await client.add_cog(Math(client))
