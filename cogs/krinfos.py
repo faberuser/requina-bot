@@ -1220,7 +1220,7 @@ class KingsRaidInfos(commands.Cog):
             await self.add_react(ctx, range_, msg)
             re_ = await self.wait_for_react(ctx, msg)
             try:
-                channel_id = re.search(f"{'<#'}(.*?){'>'}", re_).group(1)
+                channel_id = research.search(f"{'<#'}(.*?){'>'}", re_).group(1)
             except:
                 cate_ = re_[3:]
                 embed, count = self.preview_embed(guild, cate_, False)
@@ -1231,7 +1231,7 @@ class KingsRaidInfos(commands.Cog):
                 else:
                     await self.add_react(ctx, count, msg)
                     re_ = await self.wait_for_react(ctx, msg)
-                channel_id = re.search(f"{'<#'}(.*?){'>'}", re_).group(1)
+                channel_id = research.search(f"{'<#'}(.*?){'>'}", re_).group(1)
             channel = self.client.get_channel(int(channel_id))
             embeds = await self.get_embed(channel)
             await msg.delete()
@@ -1319,7 +1319,7 @@ class KingsRaidInfos(commands.Cog):
                     for fm in pic:
                         if fm in message:
                             msgc = message
-                            url = re.search(f"{url_start}(.*?){fm}", msgc).group(1)
+                            url = research.search(f"{url_start}(.*?){fm}", msgc).group(1)
                             embed.set_image(url=url_start + url + fm)
                             break
             if "https://imgur.com/" in message:
@@ -1439,7 +1439,7 @@ class KingsRaidInfos(commands.Cog):
                 pass
         if out_i is False:
             re_ = await self.wait_for_react(ctx, msg)
-        channel_id = re.search(f"{'<#'}(.*?){'>'}", re_).group(1)
+        channel_id = research.search(f"{'<#'}(.*?){'>'}", re_).group(1)
         channel = self.client.get_channel(int(channel_id))
         embeds = await self.get_embed(channel)
         await msg.delete()
