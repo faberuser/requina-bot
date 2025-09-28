@@ -11,8 +11,9 @@ from .utils import paginator, info_embed, embed_file
 
 class KingsRaidInfos(commands.Cog):
     def __init__(self, client):
-        # game infos
         self.client = client
+
+        self.game_data_path = "./kingsraid-data"
         self.menus = paginator.Paginator(self.client)
         self.defaul_embed = info_embed.Info_Embed()
         self.embed_file = embed_file.embed_file
@@ -54,8 +55,8 @@ class KingsRaidInfos(commands.Cog):
                 with open("./data/emojis.json") as e:
                     re = json.load(e)
                 emojis = re["heroes"]
-                for obj in os.listdir("./data/kr/table-data/heroes"):
-                    with open(f"./data/kr/table-data/heroes/{obj}") as f:
+                for obj in os.listdir(self.game_data_path + "/table-data/heroes"):
+                    with open(self.game_data_path + f"/table-data/heroes/{obj}") as f:
                         re = json.load(f)
                     emj = emojis[obj[:-5]]
                     if re["infos"]["class"] == "Archer":
@@ -315,8 +316,8 @@ class KingsRaidInfos(commands.Cog):
             list_ = []
             with open("./data/emojis.json") as e:
                 emojis = json.load(e)
-            for obj in os.listdir("./data/kr/table-data/heroes"):
-                with open(f"./data/kr/table-data/heroes/{obj}") as f:
+            for obj in os.listdir(self.game_data_path + "/table-data/heroes"):
+                with open(self.game_data_path + f"/table-data/heroes/{obj}") as f:
                     re = json.load(f)
                 if re["infos"]["class"] == class_:
                     emj = emojis["heroes"][obj[:-5]]
@@ -386,7 +387,7 @@ class KingsRaidInfos(commands.Cog):
     def find(self, input_: str):  # find hero or boss in data
         objs = []
         aliases = {}
-        paths = ["./data/kr/table-data/heroes", "./data/kr/table-data/bosses"]
+        paths = [self.game_data_path + "/table-data/heroes", self.game_data_path + "/table-data/bosses"]
         for path in paths:
             for obj in os.listdir(path):
                 objs.append(str(obj[:-5]))
@@ -400,21 +401,21 @@ class KingsRaidInfos(commands.Cog):
         re_ = re[0]
         boss = None
         try:
-            with open(f"./data/kr/table-data/heroes/{re[0]}.json") as f:
+            with open(self.game_data_path + f"/table-data/heroes/{re[0]}.json") as f:
                 data = json.load(f)
         except FileNotFoundError:
             try:
-                with open(f"./data/kr/table-data/heroes/{aliases[re[0]]}.json") as f:
+                with open(self.game_data_path + f"/table-data/heroes/{aliases[re[0]]}.json") as f:
                     data = json.load(f)
                     re_ = aliases[re[0]]
             except:
                 try:
-                    with open(f"./data/kr/table-data/bosses/{re[0]}.json") as f:
+                    with open(self.game_data_path + f"/table-data/bosses/{re[0]}.json") as f:
                         data = json.load(f)
                         boss = True
                 except:
                     with open(
-                        f"./data/kr/table-data/bosses/{aliases[re[0]]}.json"
+                        self.game_data_path + f"/table-data/bosses/{aliases[re[0]]}.json"
                     ) as f:
                         data = json.load(f)
                         re_ = aliases[re[0]]
@@ -517,7 +518,7 @@ class KingsRaidInfos(commands.Cog):
         name = f"{obj}_ico.png"
         if " " in name:
             name = name.replace(" ", "_")
-        file = discord.File(data["infos"]["thumbnail"], filename=name)
+        file = discord.File(self.game_data_path + "/assets/" + data["infos"]["thumbnail"], filename=name)
         embed.set_thumbnail(url=f"attachment://{name}")
         return embed, file
 
@@ -679,12 +680,12 @@ class KingsRaidInfos(commands.Cog):
 
     def get_class_perk(self, cls, clr):  # get class's perk
         des = "**T1 Perks**\n"
-        with open(f"./data/kr/table-data/classes/General.json") as f:
+        with open(self.game_data_path + f"/table-data/classes/General.json") as f:
             t1 = json.load(f)["perks"]["t1"]
         for perk in t1:
             des += "**" + perk + "**\n" + t1[perk] + "\n"
         des += "\n**T2 Perks**\n"
-        with open(f"./data/kr/table-data/classes/{cls}.json") as f:
+        with open(self.game_data_path + f"/table-data/classes/{cls}.json") as f:
             t2 = json.load(f)["perks"]["t2"]
         for perk in t2:
             des += "**" + perk + "**\n" + t2[perk] + "\n"
@@ -712,7 +713,7 @@ class KingsRaidInfos(commands.Cog):
         name = f"{obj}_uw.png"
         if " " in name:
             name = name.replace(" ", "_")
-        file = discord.File(data["uw"]["thumbnail"], filename=name)
+        file = discord.File(self.game_data_path + "/assets/" + data["uw"]["thumbnail"], filename=name)
         embed.set_thumbnail(url=f"attachment://{name}")
         return embed, file
 
@@ -740,7 +741,7 @@ class KingsRaidInfos(commands.Cog):
             name = f"{obj}_sw.png"
             if " " in name:
                 name = name.replace(" ", "_")
-            file = discord.File(data["sw"]["thumbnail"], filename=name)
+            file = discord.File(self.game_data_path + "/assets/" + data["sw"]["thumbnail"], filename=name)
             embed.set_thumbnail(url=f"attachment://{name}")
         except:
             pass
@@ -755,7 +756,7 @@ class KingsRaidInfos(commands.Cog):
         name = f"{obj}_{cate}.png"
         if " " in name:
             name = name.replace(" ", "_")
-        file = discord.File(data[cate], filename=name)
+        file = discord.File(self.game_data_path + "/assets/" + data[cate], filename=name)
         embed.set_image(url=f"attachment://{name}")
         return embed, file
 
@@ -773,7 +774,7 @@ class KingsRaidInfos(commands.Cog):
         msg_ = ""
         ls = []
         num = 0
-        for costumes_ in os.listdir(data["costumes"]):
+        for costumes_ in os.listdir(self.game_data_path + "/assets/" + data["costumes"]):
             ls.append(costumes_)
         for cos_ in sorted(ls):
             msg_ += numbers[num] + ". "
@@ -817,7 +818,7 @@ class KingsRaidInfos(commands.Cog):
                 name = (name.replace("(", "_")).replace(")", "_")
             if "?" in cos:
                 cos = cos.replace("?", "%")
-            file = discord.File(data["costumes"] + f"/{cos}.png", filename=name)
+            file = discord.File(self.game_data_path + "/assets/" + data["costumes"] + f"/{cos}.png", filename=name)
             embed.set_image(url=f"attachment://{name}")
             embed.set_footer(
                 text="Hit the below emoji in 10 sec if the image is not loaded properly."
@@ -841,7 +842,7 @@ class KingsRaidInfos(commands.Cog):
                         "reaction_add", timeout=10.0, check=check_
                     )
                     if str(reaction_.emoji) in rep:
-                        file = discord.File(data["costumes"] + f"/{cos}.png")
+                        file = discord.File(self.game_data_path + "/assets/" + data["costumes"] + f"/{cos}.png")
                         await ctx.reply(f"**{msg.embeds[0].title}**", file=file)
                         await msg.delete()
                 except asyncio.TimeoutError:
@@ -965,7 +966,7 @@ class KingsRaidInfos(commands.Cog):
             name = f"{obj}_ut{str(num)}.png"
             if " " in name:
                 name = name.replace(" ", "_")
-            file = discord.File(data["uts"][str(num)]["thumbnail"], filename=name)
+            file = discord.File(self.game_data_path + "/assets/" + data["uts"][str(num)]["thumbnail"], filename=name)
             embed.set_thumbnail(url=f"attachment://{name}")
             embed.set_footer(
                 text="Read the UT name, description or thumbnail and CAREFULLY compare with the ingame UT."
@@ -990,7 +991,7 @@ class KingsRaidInfos(commands.Cog):
             )
             await ctx.reply(embed=embed)
         else:
-            with open("./data/kr/table-data/technomagic_gear.json") as f:
+            with open(self.game_data_path + "/table-data/technomagic_gear.json") as f:
                 re = json.load(f)
             boss_type = []
             classes = [
@@ -1035,7 +1036,7 @@ class KingsRaidInfos(commands.Cog):
             await ctx.reply(embed=embed)
 
         else:
-            with open("./data/kr/table-data/artifacts.json") as f:
+            with open(self.game_data_path + "/table-data/artifacts.json") as f:
                 atf = json.load(f)
             ls = []
             aliases = {}
@@ -1143,7 +1144,7 @@ class KingsRaidInfos(commands.Cog):
                         name = name.replace(" ", "_")
                     if "'" in name:
                         name = name.replace("'", "")
-                    file = discord.File(atf[atf_name]["thumbnail"], filename=name)
+                    file = discord.File(self.game_data_path + "/assets/" + atf[atf_name]["thumbnail"], filename=name)
                     embed.set_thumbnail(url=f"attachment://{name}")
                     await ctx.reply(embed=embed, file=file)
 
