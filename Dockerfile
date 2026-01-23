@@ -24,8 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # copy every content from the local file to the image
 COPY . /app
 
-# initialize and update git submodules only
-RUN git submodule update --init --recursive
+# clone the kingsraid-data repository
+RUN git clone https://github.com/faberuser/kingsraid-data.git /app/kingsraid-data
 
 # configure the container to run in an executed manner
 ENTRYPOINT [ "python" ]
