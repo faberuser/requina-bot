@@ -1,19 +1,23 @@
 # Source code from https://github.com/duckness/NotCleo
 
-import discord, asyncio, time, math, json, concurrent.futures
+import discord
+import asyncio
+import math
+import json
+import concurrent.futures
 from discord.ext import commands
-from typing import Any
 from py_expression_eval import Parser
 from beautifultable import BeautifulTable
 from .utils import info_embed
 import config
+
 
 class Math(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.parser = Parser()
         self.info_embed_ = info_embed.Info_Embed()
-        with open('./kingsraid-data/softcap.json') as f:
+        with open('./kingsraid-data/table-data/softcap.json') as f:
             sc = json.load(f)
         self.softcaps = sc
 
@@ -158,7 +162,7 @@ class Math(commands.Cog):
 
         return "```\n" + str(table) + "\n```"
 
-    @commands.command( # calculate command
+    @commands.command(  # calculate command
         aliases=["calc", "math", "calculator", "calculation", "calculations"]
     )
     async def calculate(self, ctx, *, expression=None):
@@ -185,7 +189,7 @@ class Math(commands.Cog):
             except:
                 await ctx.reply("I can't calculate that...")
 
-    @commands.command( # softcap command
+    @commands.command(  # softcap command
         aliases=["soft", "softs", "cap", "caps", "softcaps", "stat", "stats"]
     )
     async def softcap(self, ctx, val: int = None):
