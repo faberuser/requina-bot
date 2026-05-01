@@ -17,7 +17,7 @@ class Math(commands.Cog):
         self.client = client
         self.parser = Parser()
         self.info_embed_ = info_embed.Info_Embed()
-        with open('./kingsraid-data/table-data/softcap.json') as f:
+        with open('./kingsraid-data/table-data/legacy/softcap.json') as f:
             sc = json.load(f)
         self.softcaps = sc
 
