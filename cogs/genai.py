@@ -13,7 +13,7 @@ class GenAI(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases=['summary', 'sum'])
+    @commands.command(aliases=['summarise', 'summary', 'sum'])
     async def summarize(self, ctx, history_length: int = 100):
         bot_msg = await ctx.reply("Summarizing the conversation...")
         try:
